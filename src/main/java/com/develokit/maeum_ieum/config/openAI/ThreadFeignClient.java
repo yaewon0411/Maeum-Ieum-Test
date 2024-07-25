@@ -1,6 +1,7 @@
 package com.develokit.maeum_ieum.config.openAI;
 
 import com.develokit.maeum_ieum.config.openAI.header.OpenAiHeaderConfiguration;
+import com.develokit.maeum_ieum.dto.openAi.audio.ReqDto.AudioRequestDto;
 import com.develokit.maeum_ieum.dto.openAi.message.ReqDto;
 import com.develokit.maeum_ieum.dto.openAi.message.RespDto.ListMessageRespDto;
 import com.develokit.maeum_ieum.dto.openAi.message.RespDto.MessageRespDto;
@@ -69,5 +70,7 @@ public interface ThreadFeignClient {
     @PostMapping("/{threadId}/runs/{runId}/cancel") //in_progress 상태인 런 삭제
     RunRespDto cancelRun(@PathVariable("threadId")String threadId, @PathVariable("runId")String runId);
 
+    @PostMapping(value = "/audio/speech", produces = "audio/mpeg") //어시스턴트 답변 -> audio로 변환
+    byte[] createSpeech(@RequestBody AudioRequestDto audioRequestDto);
 
 }
