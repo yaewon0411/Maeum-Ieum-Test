@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 @Getter
-@AllArgsConstructor
 @RequiredArgsConstructor
 public class LoginUser implements UserDetails {
 
