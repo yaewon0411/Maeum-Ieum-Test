@@ -1,11 +1,13 @@
 package com.develokit.maeum_ieum.service;
 
 import com.develokit.maeum_ieum.domain.user.Gender;
+import com.develokit.maeum_ieum.domain.user.Role;
 import com.develokit.maeum_ieum.domain.user.caregiver.CareGiverRepository;
 import com.develokit.maeum_ieum.domain.user.caregiver.Caregiver;
 import com.develokit.maeum_ieum.dto.caregiver.ReqDto;
 import com.develokit.maeum_ieum.dto.caregiver.RespDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -39,8 +42,11 @@ class CaregiverServiceTest {
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+
+
     @Mock
     private S3Service s3Service;
+
 
 
     @Test
@@ -49,7 +55,7 @@ class CaregiverServiceTest {
         JoinReqDto joinReqDto = new JoinReqDto();
         joinReqDto.setName("userA");
         joinReqDto.setContact("010-1234-5678");
-        joinReqDto.setGender(Gender.FEMALE);
+        joinReqDto.setGender(Gender.FEMALE.toString());
         joinReqDto.setPassword("1234");
         joinReqDto.setUsername("user1111");
         joinReqDto.setImg(new MockMultipartFile("imgFile", new byte[0]));

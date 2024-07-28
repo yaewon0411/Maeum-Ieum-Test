@@ -1,7 +1,9 @@
 package com.develokit.maeum_ieum.domain.user.elderly;
 
 import com.develokit.maeum_ieum.domain.assistant.Assistant;
+import com.develokit.maeum_ieum.domain.assistant.AssistantRepository;
 import com.develokit.maeum_ieum.domain.user.Gender;
+import com.develokit.maeum_ieum.domain.user.Role;
 import com.develokit.maeum_ieum.domain.user.User;
 import com.develokit.maeum_ieum.domain.user.caregiver.Caregiver;
 import jakarta.persistence.*;
@@ -34,9 +36,17 @@ public class Elderly extends User {
     @Embedded
     private EmergencyContactInfo emergencyContactInfo;
 
+    public boolean hasAssistant(){
+        if(assistant != null) return false;
+        return true;
+    }
+    public void attachAssistant(Assistant assistant){
+        this.assistant = assistant;
+    }
+
     @Builder
-    public Elderly(String name, String contact, Gender gender, String imgUrl, LocalDate birthDate, String organization, String healthInfo, String homeAddress, Caregiver caregiver, Assistant assistant, EmergencyContactInfo emergencyContactInfo) {
-        super(name, contact, gender, imgUrl, birthDate, organization);
+    public Elderly(String name, String contact, Gender gender, String imgUrl, LocalDate birthDate, String organization, String healthInfo, String homeAddress, Caregiver caregiver, Assistant assistant, EmergencyContactInfo emergencyContactInfo, Role role) {
+        super(name, contact, gender, imgUrl, birthDate, organization, role);
         this.healthInfo = healthInfo;
         this.homeAddress = homeAddress;
         this.caregiver = caregiver;

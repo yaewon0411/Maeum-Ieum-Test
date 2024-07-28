@@ -5,18 +5,17 @@ import com.develokit.maeum_ieum.domain.user.caregiver.Caregiver;
 import com.develokit.maeum_ieum.dto.caregiver.ReqDto;
 import com.develokit.maeum_ieum.dto.caregiver.RespDto;
 import com.develokit.maeum_ieum.dto.elderly.ReqDto.ElderlyCreateReqDto;
+import com.develokit.maeum_ieum.dto.openAi.assistant.ReqDto.CreateAssistantReqDto;
 import com.develokit.maeum_ieum.service.CaregiverService;
 import com.develokit.maeum_ieum.service.ElderlyService;
 import com.develokit.maeum_ieum.util.ApiUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.beans.BeanInfo;
 
@@ -30,14 +29,24 @@ public class CaregiverController {
     private final CaregiverService caregiverService;
     private final ElderlyService elderlyService;
 
-    //TODO: bindingResult 검증 만들기!!
-    @PostMapping("/")
-    public ResponseEntity<?> join(@RequestBody JoinReqDto joinReqDto, BindingResult bindingResult){
+    @PostMapping
+    public ResponseEntity<?> join(@Valid @RequestBody JoinReqDto joinReqDto, BindingResult bindingResult){
         return new ResponseEntity<>(ApiUtil.success(caregiverService.join(joinReqDto)), HttpStatus.CREATED);
     }
 
-    @PostMapping("/elderly")
-    public ResponseEntity<?> createElderly(@RequestBody ElderlyCreateReqDto elderlyCreateReqDto, @AuthenticationPrincipal LoginUser loginUser){
-        return new ResponseEntity<>(ApiUtil.success(elderlyService.createElderly(elderlyCreateReqDto, loginUser.getCaregiver())), HttpStatus.CREATED);
+    @PostMapping("/elderlys")
+    public ResponseEntity<?> createElderly(@RequestBody ElderlyCreateReqDto elderlyCreateReqDto,
+                                           BindingResult bindingResult,
+                                           @AuthenticationPrincipal LoginUser loginUser
+                                           ){
+
+        return new ResponseEntity<>(ApiUtil.success(elderlyService.createElderly(elderlyCreateReqDto, loginUser.getCaregiver().getUsername())), HttpStatus.CREATED);
+    }
+    @PostMapping("/elderlys/{elderlyId}/assistants")
+    public ResponseEntity<?> createAssistant(@RequestBody CreateAssistantReqDto createAssistantReqDto,
+                                             @PathVariable(name = "elderlyId")Long elderlyId,
+                                             BindingResult bindingResult,
+                                             @AuthenticationPrincipal LoginUser loginUser){
+        return new ResponseEntity<>(ApiUtil.success(caregiverService.attachAssistantToElderly(createAssistantReqDto, elderlyId, loginUser.getCaregiver())),HttpStatus.CREATED);
     }
 }
