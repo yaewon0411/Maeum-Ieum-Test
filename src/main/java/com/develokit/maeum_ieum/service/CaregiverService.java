@@ -12,13 +12,17 @@ import com.develokit.maeum_ieum.dto.caregiver.RespDto.JoinRespDto;
 import com.develokit.maeum_ieum.dto.openAi.assistant.ReqDto;
 import com.develokit.maeum_ieum.ex.CustomApiException;
 import lombok.*;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.develokit.maeum_ieum.dto.caregiver.ReqDto.*;
+import static com.develokit.maeum_ieum.dto.caregiver.RespDto.*;
 import static com.develokit.maeum_ieum.dto.openAi.assistant.ReqDto.*;
 import static com.develokit.maeum_ieum.service.OpenAiService.*;
 
@@ -35,7 +39,7 @@ public class CaregiverService {
     private final AssistantRepository assistantRepository;
 
     @Transactional
-    public JoinRespDto join(JoinReqDto joinReqDto){
+    public JoinRespDto join(JoinReqDto joinReqDto){ //회원가입
 
         //아이디 중복 검사
         Optional<Caregiver> caregiverOP = careGiverRepository.findByUsername(joinReqDto.getUsername());
@@ -53,7 +57,7 @@ public class CaregiverService {
         return new JoinRespDto(caregiverPS);
     }
 
-    @Transactional
+    @Transactional //노인 사용자의 AI Assistant 생성
     public CreateAssistantRespDto attachAssistantToElderly(CreateAssistantReqDto  createAssistantReqDto, Long elderlyId, Caregiver caregiver){
 
         //존재하는 전문가인지 검사
@@ -137,6 +141,23 @@ public class CaregiverService {
             this.instructions = instructions;
         }
     }
+
+    //홈 화면 (요양사 이름, 이미지, 총 관리 인원, 기관, 노인 사용자(이름, 나이, 주소, 연락처, 마지막 방문(n시간 전), 마지막 대화(n시간 전)), AI 붙어있는 거
+
+
+
+    public MyInfoRespDto caregiverInfo(String username){//내 정보(이름, 이미지, 성별, 생년월일, 주거지, 소속기관, 연락처)
+
+        //요양사 검증
+        Caregiver caregiverPS = careGiverRepository.findByUsername(username)
+                .orElseThrow(
+                        () -> new CustomApiException("존재하지 않는 정보입니다")
+                );
+
+        return new MyInfoRespDto(caregiverPS);
+    }
+
+
 
 
 

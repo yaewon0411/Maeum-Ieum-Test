@@ -42,11 +42,16 @@ public class CaregiverController {
 
         return new ResponseEntity<>(ApiUtil.success(elderlyService.createElderly(elderlyCreateReqDto, loginUser.getCaregiver().getUsername())), HttpStatus.CREATED);
     }
-    @PostMapping("/elderlys/{elderlyId}/assistants")
+    @PostMapping("/elderlys/{elderlyId}/assistants") //AI Assistant 생성
     public ResponseEntity<?> createAssistant(@RequestBody CreateAssistantReqDto createAssistantReqDto,
                                              @PathVariable(name = "elderlyId")Long elderlyId,
                                              BindingResult bindingResult,
                                              @AuthenticationPrincipal LoginUser loginUser){
         return new ResponseEntity<>(ApiUtil.success(caregiverService.attachAssistantToElderly(createAssistantReqDto, elderlyId, loginUser.getCaregiver())),HttpStatus.CREATED);
+    }
+
+    @GetMapping("/login-user") //내 정보
+    public ResponseEntity<?> getCaregiverInfo(@AuthenticationPrincipal LoginUser loginUser){
+        return new ResponseEntity<>(ApiUtil.success(caregiverService.caregiverInfo(loginUser.getUsername())),HttpStatus.OK);
     }
 }
