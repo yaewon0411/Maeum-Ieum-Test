@@ -12,10 +12,10 @@ import com.develokit.maeum_ieum.dto.elderly.ReqDto;
 import com.develokit.maeum_ieum.dto.elderly.ReqDto.ElderlyCreateReqDto;
 import com.develokit.maeum_ieum.dto.elderly.RespDto;
 import com.develokit.maeum_ieum.ex.CustomApiException;
+import com.develokit.maeum_ieum.util.CustomUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,12 +42,6 @@ public class ElderlyService {
     public ElderlyCreateRespDto createElderly(ElderlyCreateReqDto elderlyCreateReqDto, String username){
 
         //요양사 검증
-//        careGiverRepository.findByUsername(caregiver.getUsername())
-//                    .orElseThrow(() -> new CustomApiException("등록할 권한이 없습니다"));
-
-        List<Caregiver> all = careGiverRepository.findAll();
-
-        System.out.println("username = " + username);
         Caregiver caregiverPS = careGiverRepository.findByUsername(username)
                 .orElseThrow(
                         () -> new CustomApiException("등록 권한이 없습니다")
@@ -69,7 +63,7 @@ public class ElderlyService {
     }
 
     //홈화면(노인): assistant의 pk -> 마지막 대화 시간, 이름, 생년월일(나이), 프로필 img, 요양사 이름, 요양사 프로필, 요양사 저나번호
-    public void mainHome(Long assistantId){
+    public MainHomeRespDto mainHome(Long assistantId){
 
         //어시스턴트 찾기
         Assistant assistantPS = assistantRepository.findById(assistantId)
@@ -77,8 +71,27 @@ public class ElderlyService {
                         () -> new CustomApiException("등록된 AI 어시스턴트가 존재하지 않습니다")
                 );
 
+        //연결된 노인 사용자 찾기
+        Elderly elderlyPS = elderlyRepository.findByAssistant(assistantPS)
+                .orElseThrow(
+                        () -> new CustomApiException("등록되지 않은 노인 사용자 입니다")
+                );
 
+        //연결된 요양사 찾기
+        Caregiver caregiverPS = careGiverRepository.findById(elderlyPS.getCaregiver().getId())
+                .orElseThrow(
+                        () -> new CustomApiException("해당 전문 요양사가 존재하지 않습니다")
+                );
+
+        return new MainHomeRespDto(caregiverPS, elderlyPS);
     }
+
+
+    //채팅 화면 들어가기: 어시스턴트 이름
+
+
+
+
 
 
 
