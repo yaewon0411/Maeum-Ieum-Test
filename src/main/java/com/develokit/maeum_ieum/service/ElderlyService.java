@@ -1,5 +1,7 @@
 package com.develokit.maeum_ieum.service;
 
+import com.develokit.maeum_ieum.domain.assistant.Assistant;
+import com.develokit.maeum_ieum.domain.assistant.AssistantRepository;
 import com.develokit.maeum_ieum.domain.user.Gender;
 import com.develokit.maeum_ieum.domain.user.caregiver.CareGiverRepository;
 import com.develokit.maeum_ieum.domain.user.caregiver.Caregiver;
@@ -33,6 +35,7 @@ public class ElderlyService {
     private final ElderlyRepository elderlyRepository;
     private final CareGiverRepository careGiverRepository;
     private final S3Service s3Service;
+    private final AssistantRepository assistantRepository;
 
     //노인 등록
     @Transactional
@@ -63,6 +66,18 @@ public class ElderlyService {
         Elderly elderlyPS = elderlyRepository.save(elderlyCreateReqDto.toEntity(caregiverPS, imgUrl));
 
         return new ElderlyCreateRespDto(elderlyPS);
+    }
+
+    //홈화면(노인): assistant의 pk -> 마지막 대화 시간, 이름, 생년월일(나이), 프로필 img, 요양사 이름, 요양사 프로필, 요양사 저나번호
+    public void mainHome(Long assistantId){
+
+        //어시스턴트 찾기
+        Assistant assistantPS = assistantRepository.findById(assistantId)
+                .orElseThrow(
+                        () -> new CustomApiException("등록된 AI 어시스턴트가 존재하지 않습니다")
+                );
+
+
     }
 
 

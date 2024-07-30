@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -32,6 +35,8 @@ public class Assistant extends BaseEntity {
     private String responseType; //응답 형식
     private String personality; //성격
     private String forbiddenTopic; //금기 주제
+
+
 
     @Builder
     public Assistant(String name, Caregiver caregiver, Elderly elderly, String rule, String conversationTopic, String responseType, String personality, String forbiddenTopic, String openAiAssistantId) {
