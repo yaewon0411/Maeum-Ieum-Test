@@ -2,10 +2,10 @@ package com.develokit.maeum_ieum.controller;
 
 import com.develokit.maeum_ieum.config.loginUser.LoginUser;
 import com.develokit.maeum_ieum.domain.user.caregiver.Caregiver;
+import com.develokit.maeum_ieum.dto.assistant.ReqDto.CreateAssistantReqDto;
 import com.develokit.maeum_ieum.dto.caregiver.ReqDto;
 import com.develokit.maeum_ieum.dto.caregiver.RespDto;
 import com.develokit.maeum_ieum.dto.elderly.ReqDto.ElderlyCreateReqDto;
-import com.develokit.maeum_ieum.dto.openAi.assistant.ReqDto.CreateAssistantReqDto;
 import com.develokit.maeum_ieum.service.CaregiverService;
 import com.develokit.maeum_ieum.service.ElderlyService;
 import com.develokit.maeum_ieum.util.ApiUtil;
@@ -47,7 +47,7 @@ public class CaregiverController {
                                              @PathVariable(name = "elderlyId")Long elderlyId,
                                              BindingResult bindingResult,
                                              @AuthenticationPrincipal LoginUser loginUser){
-        return new ResponseEntity<>(ApiUtil.success(caregiverService.attachAssistantToElderly(createAssistantReqDto, elderlyId, loginUser.getCaregiver())),HttpStatus.CREATED);
+        return new ResponseEntity<>(ApiUtil.success(caregiverService.attachAssistantToElderly(createAssistantReqDto, elderlyId, loginUser.getCaregiver().getUsername())),HttpStatus.CREATED);
     }
 
     @GetMapping("/login-user") //내 정보
