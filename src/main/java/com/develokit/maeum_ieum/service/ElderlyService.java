@@ -1,5 +1,6 @@
 package com.develokit.maeum_ieum.service;
 
+import com.amazonaws.services.s3.transfer.internal.CompleteMultipartCopy;
 import com.develokit.maeum_ieum.domain.assistant.Assistant;
 import com.develokit.maeum_ieum.domain.assistant.AssistantRepository;
 import com.develokit.maeum_ieum.domain.user.Gender;
@@ -11,6 +12,9 @@ import com.develokit.maeum_ieum.domain.user.elderly.EmergencyContactInfo;
 import com.develokit.maeum_ieum.dto.elderly.ReqDto;
 import com.develokit.maeum_ieum.dto.elderly.ReqDto.ElderlyCreateReqDto;
 import com.develokit.maeum_ieum.dto.elderly.RespDto;
+import com.develokit.maeum_ieum.dto.openAi.message.ReqDto.ContentDto;
+import com.develokit.maeum_ieum.dto.openAi.message.ReqDto.CreateMessageReqDto;
+import com.develokit.maeum_ieum.dto.openAi.message.RespDto.MessageRespDto;
 import com.develokit.maeum_ieum.ex.CustomApiException;
 import com.develokit.maeum_ieum.util.CustomUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,8 +28,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static com.develokit.maeum_ieum.dto.elderly.RespDto.*;
+import static com.develokit.maeum_ieum.dto.openAi.thread.RespDto.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +42,7 @@ public class ElderlyService {
     private final CareGiverRepository careGiverRepository;
     private final S3Service s3Service;
     private final AssistantRepository assistantRepository;
+    private final OpenAiService openAiService;
 
     //노인 등록
     @Transactional
@@ -87,7 +94,63 @@ public class ElderlyService {
     }
 
 
-    //채팅 화면 들어가기: 어시스턴트 이름
+    //채팅 화면 들어가기: 어시스턴트 이름 + 이전 대화 기록 -> 우선 어시스턴트 이름과 openAiAssistant아이디 반환
+    public CheckAssistantRespDto checkAssistant(Long assistantId){
+        //어시스턴트 검증
+        Assistant assistantPS = assistantRepository.findById(assistantId)
+                .orElseThrow(
+                        () -> new CustomApiException("존재하지 않는 AI Assistant 입니다")
+                );
+
+        //스레드 있는지 확인
+        String threadId = "";
+        //스레드가 있는지 확인 -> 없으면 스레드 생성
+        if(assistantPS.hasThread()){ //스레드 있음
+            threadId = assistantPS.getThreadId();
+        }else{ //스레드 없음 -> 생성 후 db에 스레드 아이디 저장
+            ThreadRespDto threadRespDto = openAiService.createThread();
+            threadId = threadRespDto.getId();
+            assistantPS.attachThread(threadId);
+        }
+
+        //이전 대화 기록
+
+
+
+        return null;
+    }
+    @NoArgsConstructor
+    public static class CheckAssistantRespDto{
+        private String threadId;
+        private String assistantName;
+        private String openAiAssistantId;
+
+        public CheckAssistantRespDto(String threadId, String assistantName, String openAiAssistantId) {
+            this.threadId = threadId;
+            this.assistantName = assistantName;
+            this.openAiAssistantId = openAiAssistantId;
+        }
+    }
+
+
+    //채팅 하기 -> 스레드 아이디, 어시스턴트 아이디, 요청 보낼 메시지 DTO 필요
+    public void streamChat(String openAiAssistantId, String threadId, ContentDto contentDto){
+
+        //메시지 생성
+        MessageRespDto messageRespDto = openAiService.createMessage(threadId, new CreateMessageReqDto(
+                "user",
+                contentDto.getContent()
+        ));
+
+        //스트림 런 -> event: thread.message.delta가 되면 delta.value내용을 꺼낸다
+        openAiService.createStreamRun(openAiAssistantId, threadId);
+
+
+
+
+    }
+
+
 
 
 
