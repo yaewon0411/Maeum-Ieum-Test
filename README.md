@@ -1,8 +1,7 @@
 ## ERD
 
-![img.png](img.png)
 
-
+<img src="img.png" width="500" height = "600"/>
 
 
 
