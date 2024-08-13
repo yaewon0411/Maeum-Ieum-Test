@@ -36,3 +36,21 @@ However, it only works for types. Most importantly, it requires that all supercl
 ### 에러 2: InvalidDefinitionException
 - Jakson이 직렬화할 수 있는 접근 가능한 필드나 게터가 없기 때문에 발생
 - DTO의 private 필드에 대해서 Getter를 열어줘야 한다
+
+### Swagger 설정
+@Operation : endpoint에 대한 요약, 설명 등을 지정하는 용도로 사용. 컨트롤러 내 메서드에 사용
+- operationId : endpoint 아이디
+- summary : swagger-ui endpoint 상단에 노출되는 간단한 설명
+- description : endpoint 상세 설명
+- tags : 현재 endpoint가 속한 그룹 지정
+- response : 응답 코드, 응답 타입 등 지정
+
+@Parameter : 해당하는 endpoint의 파라미터 타입과 입력에 대한 설명 지정
+- name : 파라미터 이름
+- description : 파라미터 설명
+- requried : 필수/선택 여부 (true이면 필수, false면 선택)
+- in : 파라미터 타입 지정
+  - ParameterIn.Query : 요청 쿼리 파라미터
+  - ParameterIn.HEADER : 요청 헤더에 전달되는 파라미터
+  - ParameterIn.PATH : PathVariable에 속하는 파라미터
+  - 값없음 : RequestBody에 해당하는 객체 타입의 파라미터
