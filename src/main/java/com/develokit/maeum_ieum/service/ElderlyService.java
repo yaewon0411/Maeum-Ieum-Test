@@ -78,7 +78,6 @@ public class ElderlyService {
     //홈화면(노인): assistant의 pk -> 마지막 대화 시간, 이름, 생년월일(나이), 프로필 img, 요양사 이름, 요양사 프로필, 요양사 저나번호
     public MainHomeRespDto mainHome(Long elderlyId, Long assistantId){
 
-
         //연결된 노인 사용자 찾기
         Elderly elderlyPS = elderlyRepository.findById(elderlyId)
                 .orElseThrow(
