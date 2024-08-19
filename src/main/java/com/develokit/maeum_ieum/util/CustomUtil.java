@@ -1,9 +1,6 @@
 package com.develokit.maeum_ieum.util;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 public class CustomUtil {
@@ -28,5 +25,20 @@ public class CustomUtil {
         } else {
             return null;
         }
+    }
+    public static LocalDateTime[] getWeekStartAndEnd(LocalDateTime dateTime){
+        LocalDate date = dateTime.toLocalDate();
+        LocalDate startOfWeek = date.with(DayOfWeek.MONDAY);
+        LocalDate endOfWeek = startOfWeek.plusDays(6);
+        return new LocalDateTime[]{
+                LocalDateTime.of(startOfWeek, LocalDateTime.MIN.toLocalTime()),
+                LocalDateTime.of(endOfWeek, LocalDateTime.MAX.toLocalTime())
+        };
+    }
+    public static LocalDateTime getMonthEnd(LocalDateTime dateTime){ //해당 달이 끝나는 날 반환
+        YearMonth yearMonth = YearMonth.from(dateTime);
+        LocalDate lastDayOfMonth = yearMonth.atEndOfMonth();
+
+        return LocalDateTime.of(lastDayOfMonth, LocalTime.MAX);
     }
 }

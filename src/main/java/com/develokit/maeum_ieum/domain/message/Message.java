@@ -17,10 +17,11 @@ public class Message extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "elderly_id")
+    @JoinColumn(name = "elderly_id", nullable = false)
     private Elderly elderly;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private MessageType messageType; //USER or AI
 
     @Column(length = 2048)
