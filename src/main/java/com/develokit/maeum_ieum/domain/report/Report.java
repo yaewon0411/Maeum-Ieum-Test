@@ -2,10 +2,7 @@ package com.develokit.maeum_ieum.domain.report;
 
 import com.develokit.maeum_ieum.domain.base.BaseEntity;
 import com.develokit.maeum_ieum.domain.user.elderly.Elderly;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Report extends BaseEntity {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
     private Elderly elderly;
