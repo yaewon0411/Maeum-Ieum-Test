@@ -3,6 +3,8 @@ package com.develokit.maeum_ieum.util.api;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Schema(description = "공통 API 응답 구조")
 public class ApiResult<T> {
@@ -11,6 +13,7 @@ public class ApiResult<T> {
     private final T data;
     private final boolean success;
     private final ApiError apiError;
+    private final LocalDateTime timeStamp = LocalDateTime.now();
 
     public ApiResult(boolean success, T data, ApiError apiError) {
         this.success = success;

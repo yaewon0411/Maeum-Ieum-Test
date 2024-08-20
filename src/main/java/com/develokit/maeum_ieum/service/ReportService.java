@@ -30,7 +30,7 @@ public class ReportService {
                     Report reportPS = reportRepository.save(new Report(elderlyPS, startOfWeek, endOfWeek, false));
                     elderlyPS.getWeeklyReports().add(reportPS);
                 });
-
     }
+
 
 }
