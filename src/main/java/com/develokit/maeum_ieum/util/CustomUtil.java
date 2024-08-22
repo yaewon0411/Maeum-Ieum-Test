@@ -1,5 +1,9 @@
 package com.develokit.maeum_ieum.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
@@ -40,5 +44,11 @@ public class CustomUtil {
         LocalDate lastDayOfMonth = yearMonth.atEndOfMonth();
 
         return LocalDateTime.of(lastDayOfMonth, LocalTime.MAX);
+    }
+
+    public static String convertToJson(Object object) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        om.registerModule(new JavaTimeModule());
+        return om.writeValueAsString(object);
     }
 }

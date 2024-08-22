@@ -1,5 +1,6 @@
 package com.develokit.maeum_ieum.util.api;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -13,6 +14,8 @@ public class ApiResult<T> {
     private final T data;
     private final boolean success;
     private final ApiError apiError;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private final LocalDateTime timeStamp = LocalDateTime.now();
 
     public ApiResult(boolean success, T data, ApiError apiError) {
