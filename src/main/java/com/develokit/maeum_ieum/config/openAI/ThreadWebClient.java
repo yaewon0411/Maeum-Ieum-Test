@@ -4,13 +4,13 @@ import com.develokit.maeum_ieum.domain.message.Message;
 import com.develokit.maeum_ieum.domain.message.MessageRepository;
 import com.develokit.maeum_ieum.domain.message.MessageType;
 import com.develokit.maeum_ieum.domain.user.elderly.Elderly;
-import com.develokit.maeum_ieum.dto.message.RespDto;
 import com.develokit.maeum_ieum.dto.message.RespDto.CreateStreamMessageRespDto;
 import com.develokit.maeum_ieum.dto.openAi.audio.RespDto.CreateAudioRespDto;
 import com.develokit.maeum_ieum.dto.openAi.message.ReqDto.CreateMessageReqDto;
 import com.develokit.maeum_ieum.dto.openAi.message.RespDto.MessageRespDto;
 import com.develokit.maeum_ieum.ex.CustomApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,9 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 
 import static com.develokit.maeum_ieum.dto.openAi.audio.ReqDto.*;
 import static com.develokit.maeum_ieum.dto.openAi.run.ReqDto.*;
@@ -68,47 +70,75 @@ public class ThreadWebClient {
                     throw new CustomApiException("메시지 생성 과정에서 에러 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
                 });
     }
-
-    //스트림 런 생성
     @Transactional
-    public Flux<CreateStreamMessageRespDto> createStreamRun(String threadId, CreateRunReqDto createRunReqDto, Elderly elderly){
+    public Flux<CreateStreamMessageRespDto> createStreamRun(String threadId, CreateRunReqDto createRunReqDto, Elderly elderly) {
         return webClient.post()
                 .uri("/threads/{threadId}/runs", threadId)
                 .bodyValue(createRunReqDto)
                 .retrieve()
-                .bodyToFlux(new ParameterizedTypeReference<ServerSentEvent<String>>() {})
+                .bodyToFlux(new ParameterizedTypeReference<ServerSentEvent<String>>() {
+                })
                 .doOnError(WebClientResponseException.class, e -> {
                     logger.error(e.getMessage());
                     throw new CustomApiException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
                 })
-                .filter(event -> "thread.message.delta".equals(event.event()))
+                .filter(event -> "thread.message.delta".equals(event.event()) ||  "thread.message.completed".equals(event.event()))
                 .handle((event, sink) -> {
-                    String data = event.data();
-                    try {
-                        ObjectMapper mapper = new ObjectMapper();
-                        JsonNode rootNode = mapper.readTree(data);
-                        JsonNode deltaNode = rootNode.path("delta");
-                        JsonNode contentArray = deltaNode.path("content");
-                        if (!contentArray.isEmpty()) {
-                            JsonNode textNode = contentArray.get(0).path("text");
-                            String answer = textNode.path("value").asText();
-                            sink.next(new CreateStreamMessageRespDto(answer));
-                            return;
-                        }
-                        sink.error(new CustomApiException("답변 생성 과정에서 에러 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR));
-                    } catch (JsonProcessingException e) {
-                        logger.error(e.getMessage());
-                        sink.error(new CustomApiException("답변 직렬화 과정에서 에러 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR));
-                    }
-                });
+                            String data = event.data();
+                            try {
+                                ObjectMapper om = new ObjectMapper();
+                                JsonNode rootNode = om.readTree(data);
+
+                                if ("thread.message.delta".equals(event.event())) {
+                                    JsonNode deltaNode = rootNode.path("delta");
+                                    JsonNode contentArray = deltaNode.path("content");
+                                    if (!contentArray.isEmpty()) {
+                                        JsonNode textNode = contentArray.get(0).path("text");
+                                        String answer = textNode.path("value").asText();
+                                        sink.next(new CreateStreamMessageRespDto(answer));
+                                        return;
+                                    }
+                                } else if ("thread.message.completed".equals(event.event())) {
+                                    JsonNode contentArray = rootNode.path("content");
+                                    if (!contentArray.isEmpty()) {
+                                        JsonNode textNode = contentArray.get(0).path("text");
+                                        String answer = textNode.path("value").asText();
+
+                                        System.out.println("===================================");
+                                        System.out.println("answer = " + answer);
+                                        System.out.println("===================================");
+
+                                        messageRepository.save(Message.builder()
+                                                .messageType(MessageType.AI)
+                                                .elderly(elderly)
+                                                .content(answer)
+                                                .build());
+                                        sink.complete();
+                                        return;
+                                    }
+                                    sink.error(new CustomApiException("답변 생성 과정에서 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR));
+                                }
+                            } catch (JsonProcessingException e) {
+                                logger.error(e.getMessage());
+                                sink.error(new CustomApiException("답변 직렬화 과정에서 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR));
+                            }
+                        });
     }
 
-    //메시지 생성 후 스트림 런 작업 처리
+
+    //유저 메시지 저장 -> 메시지 생성 -> 스트림 런 작업 처리
     public Flux<CreateStreamMessageRespDto> createMessageAndStreamRun(String threadId, CreateMessageReqDto createMessageReqDto, CreateRunReqDto createRunReqDto, Elderly elderly){
-        return createMessage(threadId, createMessageReqDto)
+        return Mono.fromCallable(() -> messageRepository.save(Message.builder()
+                        .elderly(elderly)
+                        .content(createMessageReqDto.getContent())
+                        .messageType(MessageType.USER)
+                .build())
+        ).subscribeOn(Schedulers.boundedElastic())
+                .thenMany(createMessage(threadId, createMessageReqDto))
                 .thenMany(createStreamRun(threadId, createRunReqDto, elderly));
 
     }
+
 
     //비스트림 런 생성 (생성된 전체 답변)
     Mono<String> createRun(String threadId, CreateRunReqDto createRunReqDto){
@@ -126,8 +156,8 @@ public class ThreadWebClient {
                 .flatMap(event -> {
                     String data = event.data();
                     try {
-                        ObjectMapper mapper = new ObjectMapper();
-                        JsonNode rootNode = mapper.readTree(data);
+                        ObjectMapper om = new ObjectMapper();
+                        JsonNode rootNode = om.readTree(data);
                         JsonNode contentArray = rootNode.path("content");
                         if (!contentArray.isEmpty()) {
                             JsonNode textNode = contentArray.get(0).path("text");
@@ -136,7 +166,7 @@ public class ThreadWebClient {
                         return Mono.just("");
                     } catch (JsonProcessingException e) {
                         logger.error(e.getMessage());
-                        return Mono.error(e);
+                        return Mono.error(new CustomApiException("답변 생성 과정에서 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR));
                     }
                 });
     }
@@ -151,7 +181,7 @@ public class ThreadWebClient {
                 .map(CreateAudioRespDto::new)
                 .doOnError(WebClientResponseException.class, e -> {
                     logger.error(e.getMessage());
-                    throw new CustomApiException("오디오 생성 과정에서 에러 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    throw new CustomApiException("오디오 생성 과정에서 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
                 });
     }
 
@@ -163,6 +193,7 @@ public class ThreadWebClient {
                 .flatMap(text ->
                     Mono.fromCallable(() ->
                     {
+                        audioRequestDto.setInput(text);
                         Message aiMessage = messageRepository.save(Message.builder()
                                 .messageType(MessageType.AI)
                                 .content(text)
@@ -178,10 +209,6 @@ public class ThreadWebClient {
                         return Arrays.asList(aiMessage, userMessage);
                     })
                     .subscribeOn(Schedulers.boundedElastic())
-                    .onErrorResume(e -> {
-                        logger.error(e.getMessage());
-                        throw new CustomApiException("메시지 생성 또는 오디오 생성 중 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
-                    })
                     .then(createAudio(audioRequestDto))
                 );
     }
