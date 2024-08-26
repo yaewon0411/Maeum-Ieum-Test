@@ -2,6 +2,9 @@ package com.develokit.maeum_ieum.service;
 
 import com.develokit.maeum_ieum.config.openAI.ThreadWebClient;
 import com.develokit.maeum_ieum.controller.ElderlyController;
+import com.develokit.maeum_ieum.domain.message.Message;
+import com.develokit.maeum_ieum.domain.message.MessageRepository;
+import com.develokit.maeum_ieum.domain.message.MessageType;
 import com.develokit.maeum_ieum.domain.user.Gender;
 import com.develokit.maeum_ieum.domain.user.elderly.Elderly;
 import com.develokit.maeum_ieum.domain.user.elderly.ElderlyRepository;
@@ -30,17 +33,20 @@ import static com.develokit.maeum_ieum.dto.openAi.message.ReqDto.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+
 public class MessageService {
 
     private final ThreadWebClient threadWebClient;
     private final ElderlyRepository elderlyRepository;
+    private final MessageRepository messageRepository;
+
 
     public Flux<CreateStreamMessageRespDto> getStreamMessage(CreateStreamMessageReqDto createStreamMessageReqDto, Long elderlyId){
 
         Elderly elderlyPS = elderlyRepository.findById(elderlyId).orElseThrow(
                 () -> new CustomApiException("등록되지 않은 사용자 입니다. 담당 요양사에게 문의해주세요", HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND)
         );
+
 
         return threadWebClient.createMessageAndStreamRun(
                 createStreamMessageReqDto.getThreadId(),
