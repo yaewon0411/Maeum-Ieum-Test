@@ -83,6 +83,7 @@ public class ThreadWebClient {
                     throw new CustomApiException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
                 })
                 .filter(event -> "thread.message.delta".equals(event.event()) ||  "thread.message.completed".equals(event.event()))
+                .publishOn(Schedulers.boundedElastic())
                 .handle((event, sink) -> {
                             String data = event.data();
                             try {
@@ -103,11 +104,6 @@ public class ThreadWebClient {
                                     if (!contentArray.isEmpty()) {
                                         JsonNode textNode = contentArray.get(0).path("text");
                                         String answer = textNode.path("value").asText();
-
-                                        System.out.println("===================================");
-                                        System.out.println("answer = " + answer);
-                                        System.out.println("===================================");
-
                                         messageRepository.save(Message.builder()
                                                 .messageType(MessageType.AI)
                                                 .elderly(elderly)
