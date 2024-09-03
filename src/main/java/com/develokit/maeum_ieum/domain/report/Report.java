@@ -31,8 +31,6 @@ public class Report extends BaseEntity {
 
     private String memo; //메모
 
-    @Enumerated(EnumType.STRING)
-    private DayOfWeek reportDay;
     /*
 
 
@@ -41,12 +39,11 @@ public class Report extends BaseEntity {
 
 
      */
-    public Report(Elderly elderly, LocalDateTime startDate, LocalDateTime endDate, boolean isMonthly, DayOfWeek reportDay){
+    public Report(Elderly elderly, LocalDateTime startDate, LocalDateTime endDate, boolean isMonthly){
         this.elderly = elderly;
         this.startDate = startDate;
         this.endDate = endDate;
         this.isMonthly = isMonthly;
-        this.reportDay = reportDay;
     }
 
 }

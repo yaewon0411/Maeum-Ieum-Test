@@ -77,7 +77,7 @@ public class ElderlyService {
         //저장
         Elderly elderlyPS = elderlyRepository.save(elderlyCreateReqDto.toEntity(caregiverPS, imgUrl));
 
-        //보고서 생성
+        //TODO 보고서 생성 -> 출력을 원하는 요일에 생성되도록 지정해야 함
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime[] weekStartAndEnd = CustomUtil.getWeekStartAndEnd(now);
         LocalDateTime startDayOfWeek = weekStartAndEnd[0];

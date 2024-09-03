@@ -10,7 +10,6 @@ import com.develokit.maeum_ieum.dto.openAi.message.ReqDto.CreateMessageReqDto;
 import com.develokit.maeum_ieum.dto.openAi.message.RespDto.MessageRespDto;
 import com.develokit.maeum_ieum.ex.CustomApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
