@@ -5,6 +5,7 @@ import com.develokit.maeum_ieum.domain.assistant.Assistant;
 import com.develokit.maeum_ieum.domain.assistant.AssistantRepository;
 import com.develokit.maeum_ieum.domain.report.Report;
 import com.develokit.maeum_ieum.domain.report.ReportRepository;
+import com.develokit.maeum_ieum.domain.report.ReportType;
 import com.develokit.maeum_ieum.domain.user.Gender;
 import com.develokit.maeum_ieum.domain.user.caregiver.CareGiverRepository;
 import com.develokit.maeum_ieum.domain.user.caregiver.Caregiver;
@@ -84,9 +85,9 @@ public class ElderlyService {
         LocalDateTime endDayOfWeek = weekStartAndEnd[1];
         LocalDateTime lastDayOfMonth = CustomUtil.getMonthEnd(now);
 
-        //TODO 이거 날짜 의도한 대로 나오는지 확인하기 ㅡㅡ
-        Report weeklyReportPS = reportRepository.save(new Report(elderlyPS, startDayOfWeek, endDayOfWeek, false));
-        Report monthlyReportPS = reportRepository.save(new Report(elderlyPS, startDayOfWeek, lastDayOfMonth, true ));
+        //TODO 이것도 수정해야 함
+        Report weeklyReportPS = reportRepository.save(new Report(elderlyPS, startDayOfWeek, endDayOfWeek, ReportType.WEEKLY));
+        Report monthlyReportPS = reportRepository.save(new Report(elderlyPS, startDayOfWeek, lastDayOfMonth, ReportType.MONTHLY ));
 
         elderlyPS.getWeeklyReports().add(weeklyReportPS);
         elderlyPS.getMonthlyReports().add(monthlyReportPS);
