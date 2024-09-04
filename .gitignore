@@ -39,5 +39,3 @@ out/
 application-dev.yaml
 application-test.yaml
 
-
-JwtVo.java
