@@ -1,6 +1,6 @@
 
 openai:
-  key: openai.key
+  key: ${OPENAI_KEY}
 
 
 
@@ -14,10 +14,10 @@ server:
 
 spring:
   datasource:
-    url: db-url
+    url: ${DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: db-username
-    password: db-password
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   h2:
     console:
       enabled: true
@@ -48,7 +48,7 @@ cloud:
     s3:
       bucket: tutor-s3-bucket
     stack.auto: false
-    region.static: cloud.aws.region.static
+    region.static: ${REGION}
     credentials:
-      accessKey: cloud.aws.credentials.accessKey
-      secretKey: cloud.aws.credentials.secretKey
+      accessKey: ${ACCESS_KEY}
+      secretKey: ${SECRET_KEY}
