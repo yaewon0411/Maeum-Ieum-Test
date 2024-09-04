@@ -71,6 +71,7 @@ public class RespDto {
         @Schema(description = "요양사 담당 노인 사용자 리스트")
         private List<ElderlyInfoDto> elderlyInfoDto;
 
+
         public CaregiverMainRespDto(Caregiver caregiver){
             this.name = caregiver.getName();
             this.img = caregiver.getImgUrl();
@@ -97,6 +98,8 @@ public class RespDto {
             private Long id;
             @Schema(description = "어시스턴트 생성 여부: 있으면 true, 없으면 false")
             private boolean hasAssistant;
+            @Schema(description = "AI 어시스턴트 아이디")
+            private Long assistantId;
 
             public ElderlyInfoDto(Elderly elderly){
                 this.name = elderly.getName();
@@ -105,6 +108,7 @@ public class RespDto {
                 this.lastChatTime = elderly.getLastChatTime() == null ? "없음": CustomUtil.calculateHoursAgo(elderly.getLastChatTime())+"시간 전";
                 this.id = elderly.getId();
                 this.hasAssistant = elderly.hasAssistant();
+                this.assistantId = elderly.getAssistant().getId();
             }
 
         }
