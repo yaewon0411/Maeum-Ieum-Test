@@ -22,7 +22,7 @@ public class Assistant extends BaseEntity {
 
     @Column(name = "open_ai_assistant_id")
     private String openAiAssistantId; //실제 OpenAI에 등록되는 어시스턴트 아이디
-    private String name;
+    private String name; //어시스턴트 이름
 
     @Column(length = 5)
     private String accessCode;
@@ -69,4 +69,9 @@ public class Assistant extends BaseEntity {
         this.accessCode = accessCode;
         caregiver.getAssistantList().add(this);
     }
+    public void modifyAssistantName(String assistantName){
+        if(assistantName != null)
+            this.name = assistantName;
+    }
+
 }
