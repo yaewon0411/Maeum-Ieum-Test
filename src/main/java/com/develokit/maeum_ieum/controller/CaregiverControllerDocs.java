@@ -154,11 +154,11 @@ public interface CaregiverControllerDocs {
 
     @Operation(summary = "AI 어시스턴트 삭제 ", description = "어시스턴트 삭제 기능: jwt 토큰 사용")
     @ApiResponses( value = {
-            @ApiResponse(responseCode = "200", description = "어시스턴트 삭제 성공", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "토큰 기간 만료", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Authorization 헤더 재확인 바람", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "OPENAI_SERVER_ERROR | INTERNAL_SERVER_ERROR", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json"))
+            @ApiResponse(responseCode = "200", description = "어시스턴트 삭제 성공", content = @Content(schema = @Schema(implementation = AssistantDeleteRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "토큰 기간 만료", content = @Content(schema = @Schema(implementation = AssistantDeleteRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Authorization 헤더 재확인 바람", content = @Content(schema = @Schema(implementation = AssistantDeleteRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = AssistantDeleteRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "OPENAI_SERVER_ERROR | INTERNAL_SERVER_ERROR", content = @Content(schema = @Schema(implementation = AssistantDeleteRespDto.class), mediaType = "application/json"))
 
     })
     @RequireAuth
