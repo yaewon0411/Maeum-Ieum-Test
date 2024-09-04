@@ -95,7 +95,7 @@ public class RespDto {
             @Schema(description = "마지막 대화 시간: 마지막 대화 시간이 있다면 'n시간 전' 으로 나가고, 마지막 대화 시간이 없으면 '없음'으로 나감")
             private String lastChatTime;
             @Schema(description = "노인 사용자 아이디")
-            private Long id;
+            private Long elderlyId;
             @Schema(description = "어시스턴트 생성 여부: 있으면 true, 없으면 false")
             private boolean hasAssistant;
             @Schema(description = "AI 어시스턴트 아이디")
@@ -106,7 +106,7 @@ public class RespDto {
                 this.age = CustomUtil.calculateAge(elderly.getBirthDate());
                 this.contact = elderly.getContact();
                 this.lastChatTime = elderly.getLastChatTime() == null ? "없음": CustomUtil.calculateHoursAgo(elderly.getLastChatTime())+"시간 전";
-                this.id = elderly.getId();
+                this.elderlyId = elderly.getId();
                 this.hasAssistant = elderly.hasAssistant();
                 this.assistantId = elderly.getAssistant().getId();
             }
