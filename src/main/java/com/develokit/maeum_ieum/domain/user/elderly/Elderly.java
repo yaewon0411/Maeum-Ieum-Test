@@ -100,4 +100,8 @@ public class Elderly extends User {
     public void updateImg(String imgUrl){
         super.updateImg(imgUrl);
     }
+
+    public void deleteAssistant(){
+        this.assistant = null;
+    }
 }

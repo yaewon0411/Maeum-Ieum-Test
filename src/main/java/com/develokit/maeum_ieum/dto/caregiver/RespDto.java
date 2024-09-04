@@ -108,7 +108,7 @@ public class RespDto {
                 this.lastChatTime = elderly.getLastChatTime() == null ? "없음": CustomUtil.calculateHoursAgo(elderly.getLastChatTime())+"시간 전";
                 this.elderlyId = elderly.getId();
                 this.hasAssistant = elderly.hasAssistant();
-                this.assistantId = elderly.getAssistant().getId();
+                this.assistantId = hasAssistant?elderly.getAssistant().getId():null;
             }
 
         }
@@ -129,7 +129,7 @@ public class RespDto {
         @Schema(description = "요양사 성별")
         private Gender gender;
         @Schema(description = "요양사 생년월일")
-        private LocalDate birthDate;
+        private String birthDate;
         @Schema(description = "요양사 소속")
         private String organization;
         @Schema(description = "요양사 연락처")
@@ -139,7 +139,7 @@ public class RespDto {
             this.name = caregiver.getName();
             this.imgUrl = caregiver.getImgUrl();
             this.gender = caregiver.getGender();
-            this.birthDate = caregiver.getBirthDate();
+            this.birthDate = CustomUtil.BirthDateToString(caregiver.getBirthDate());
             this.organization = caregiver.getOrganization();
             this.contact = caregiver.getContact();
         }

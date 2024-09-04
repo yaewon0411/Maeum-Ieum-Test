@@ -29,8 +29,6 @@ public class JwtProvider {
                 .withClaim("role", loginUser.getCaregiver().getRole().toString())
                 .sign(Algorithm.HMAC256(JwtVo.SECRET));
 
-        System.out.println("토큰에 넣은 role 값 = " + loginUser.getCaregiver().getRole().toString());
-
         return JwtVo.TOKEN_PREFIX + jwtToken;
     }
 

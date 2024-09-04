@@ -7,6 +7,7 @@ import com.develokit.maeum_ieum.dto.assistant.ReqDto.CreateAssistantReqDto;
 import com.develokit.maeum_ieum.dto.caregiver.ReqDto;
 import com.develokit.maeum_ieum.dto.elderly.ReqDto.ElderlyCreateReqDto;
 import com.develokit.maeum_ieum.dto.elderly.RespDto;
+import com.develokit.maeum_ieum.service.AssistantService;
 import com.develokit.maeum_ieum.service.CaregiverService;
 import com.develokit.maeum_ieum.service.ElderlyService;
 import com.develokit.maeum_ieum.util.ApiUtil;
@@ -23,11 +24,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.print.attribute.standard.Media;
 import java.beans.BeanInfo;
 import java.net.MalformedURLException;
 
+import static com.develokit.maeum_ieum.dto.assistant.ReqDto.*;
 import static com.develokit.maeum_ieum.dto.caregiver.ReqDto.*;
 import static com.develokit.maeum_ieum.dto.elderly.ReqDto.*;
 import static com.develokit.maeum_ieum.dto.elderly.RespDto.*;
@@ -39,6 +42,7 @@ public class CaregiverController implements CaregiverControllerDocs {
 
     private final CaregiverService caregiverService;
     private final ElderlyService elderlyService;
+    private final AssistantService assistantService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> join(@Valid @ModelAttribute JoinReqDto joinReqDto, BindingResult bindingResult){
@@ -61,11 +65,11 @@ public class CaregiverController implements CaregiverControllerDocs {
     }
     @RequireAuth
     @PostMapping("/elderlys/{elderlyId}/assistants") //AI Assistant 생성
-    public ResponseEntity<?> createAssistant(@RequestBody CreateAssistantReqDto createAssistantReqDto,
+    public ResponseEntity<?> createAssistant(@Valid@RequestBody CreateAssistantReqDto createAssistantReqDto,
                                              @PathVariable(name = "elderlyId")Long elderlyId,
                                              BindingResult bindingResult,
                                              @AuthenticationPrincipal LoginUser loginUser){
-        return new ResponseEntity<>(ApiUtil.success(caregiverService.attachAssistantToElderly(createAssistantReqDto, elderlyId, loginUser.getCaregiver())),HttpStatus.CREATED);
+        return new ResponseEntity<>(ApiUtil.success(caregiverService.attachAssistantToElderly(createAssistantReqDto, elderlyId, loginUser.getCaregiver().getUsername())),HttpStatus.CREATED);
     }
 
     @RequireAuth
@@ -76,7 +80,7 @@ public class CaregiverController implements CaregiverControllerDocs {
 
     @RequireAuth
     @PatchMapping("/mypage") //마이페이지 수정(이미지 제외)
-    public ResponseEntity<?>modifyCaregiverInfo(@RequestBody CaregiverModifyReqDto caregiverModifyReqDto,
+    public ResponseEntity<?>modifyCaregiverInfo(@Valid@RequestBody CaregiverModifyReqDto caregiverModifyReqDto,
                                                 BindingResult bindingResult,
                                                 @AuthenticationPrincipal LoginUser loginUser){
         return new ResponseEntity<>(ApiUtil.success(caregiverService.modifyCaregiverInfo(loginUser.getCaregiver().getUsername(), caregiverModifyReqDto)), HttpStatus.OK);
@@ -85,15 +89,15 @@ public class CaregiverController implements CaregiverControllerDocs {
     //마이페이지 이미지 수정
     @RequireAuth
     @PatchMapping(value = "/mypage/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?>modifyCaregiverImg(@ModelAttribute CaregiverImgModifyReqDto caregiverImgModifyReqDto,
+    public ResponseEntity<?>modifyCaregiverImg(@RequestParam(value = "img", required = false) MultipartFile img,
                                                @AuthenticationPrincipal LoginUser loginUser){
-        return new ResponseEntity<>(ApiUtil.success(caregiverService.modifyCaregiverImg(loginUser.getCaregiver().getUsername(), caregiverImgModifyReqDto)), HttpStatus.OK);
+        return new ResponseEntity<>(ApiUtil.success(caregiverService.modifyCaregiverImg(loginUser.getCaregiver().getUsername(), img)), HttpStatus.OK);
     }
 
     //노인 기본 정보 수정(이미지 제외)
     @RequireAuth
     @PatchMapping(value = "/elderlys/{elderlyId}")
-    public ResponseEntity<?>modifyElderlyInfo(@RequestBody ElderlyModifyReqDto elderlyModifyReqDto, @PathVariable(value = "elderlyId")Long elderlyId,
+    public ResponseEntity<?>modifyElderlyInfo(@Valid@RequestBody ElderlyModifyReqDto elderlyModifyReqDto, @PathVariable(value = "elderlyId")Long elderlyId,
                                               BindingResult bindingResult, @AuthenticationPrincipal LoginUser loginUser){
         return new ResponseEntity<>(ApiUtil.success(elderlyService.modifyElderlyInfo(elderlyModifyReqDto, elderlyId)), HttpStatus.OK);
     }
@@ -101,9 +105,31 @@ public class CaregiverController implements CaregiverControllerDocs {
     //노인 기본 정보 이미지 수정
     @RequireAuth
     @PatchMapping(value = "/elderlys/{elderlyId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> modifyElderlyImg(@ModelAttribute ElderlyImgModifyReqDto elderlyImgModifyReqDto,
+    public ResponseEntity<?> modifyElderlyImg(@RequestParam(value = "img", required = false) MultipartFile img,
                                                @PathVariable(name = "elderlyId")Long elderlyId,
+                                               BindingResult bindingResult,
                                                @AuthenticationPrincipal LoginUser loginUser){
-        return new ResponseEntity<>(ApiUtil.success(elderlyService.modifyElderlyImg(elderlyImgModifyReqDto, elderlyId)), HttpStatus.OK);
+        return new ResponseEntity<>(ApiUtil.success(elderlyService.modifyElderlyImg(img, elderlyId)), HttpStatus.OK);
+    }
+
+    //TODO 어시스턴트 수정
+    @RequireAuth
+    @PatchMapping(value = "/elderlys/{elderlyId}/assistants/{assistantId}")
+    public ResponseEntity<?> modifyAssistantInfo(@Valid@RequestBody AssistantModifyReqDto assistantModifyReqDto,
+                                                 @PathVariable(name = "elderlyId")Long elderlyId,
+                                                 @PathVariable(name = "assistantId")Long assistantId,
+                                                 BindingResult bindingResult,
+                                                 @AuthenticationPrincipal LoginUser loginUser){
+        return new ResponseEntity<>(ApiUtil.success(assistantService.modifyAssistantInfo(assistantModifyReqDto, elderlyId, assistantId)), HttpStatus.OK);
+    }
+
+
+    //TODO 어시스턴트 삭제
+    @RequireAuth
+    @DeleteMapping(value = "/elderlys/{elderlyId}/assistants/{assistantId}")
+    public ResponseEntity<?> deleteAssistant(@PathVariable(name = "elderlyId")Long elderlyId,
+                                             @PathVariable(name = "assistantId")Long assistantId,
+                                             @AuthenticationPrincipal LoginUser loginUser ){
+        return new ResponseEntity<>(ApiUtil.success(assistantService.deleteAssistant(assistantId, elderlyId, loginUser.getUsername())), HttpStatus.OK);
     }
 }

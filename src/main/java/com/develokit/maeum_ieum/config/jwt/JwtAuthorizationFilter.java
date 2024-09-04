@@ -43,7 +43,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             HandlerMethod handlerMethod = (HandlerMethod) handlerMapping.getHandler(request).getHandler();
             if (handlerMethod.getMethodAnnotation(RequireAuth.class) != null) {
                 String header = request.getHeader(JwtVo.HEADER);
-                System.out.println("header = " + header);
                 if (header == null || !header.startsWith(JwtVo.TOKEN_PREFIX)) {
                     throw new CustomApiException("Authorization 헤더 재확인 바람", HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED);
                 } else return true; //헤더 검사 통과하면 필터 내에서 토큰 검증

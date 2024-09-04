@@ -187,13 +187,13 @@ public class ElderlyService {
 
     //요양사 화면에서 노인 프로필 사진 수정
     @Transactional
-    public ElderlyImgModifyRespDto modifyElderlyImg(ElderlyImgModifyReqDto elderlyImgModifyReqDto, Long elderlyId){
+    public ElderlyImgModifyRespDto modifyElderlyImg(MultipartFile file, Long elderlyId){
 
         Elderly elderlyPS = elderlyRepository.findById(elderlyId).orElseThrow(
                 () -> new CustomApiException("등록되지 않은 노인 사용자입니다", HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND)
         );
 
-        if (elderlyImgModifyReqDto == null || elderlyImgModifyReqDto.getImg() == null) {
+        if (file == null || file.isEmpty()) {
             return new ElderlyImgModifyRespDto(elderlyPS.getImgUrl());
         }
 
@@ -201,8 +201,9 @@ public class ElderlyService {
         String oldImgUrl = elderlyPS.getImgUrl();
 
         try {
-            // 새 이미지 업로드
-            newImgUrl = s3Service.uploadImage(elderlyImgModifyReqDto.getImg());
+            // 이미지 있다면 -> 새 이미지 업로드
+            if(!file.isEmpty())
+                newImgUrl = s3Service.uploadImage(file);
 
             elderlyPS.updateImg(newImgUrl);
 

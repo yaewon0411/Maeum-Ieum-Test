@@ -69,7 +69,15 @@ public class SwaggerConfig{
 
             Schema apiErrorSchema = new Schema<>();
             apiErrorSchema.addProperty("status", new Schema<>().type("integer").example(401));
-            apiErrorSchema.addProperty("msg", new Schema<>().type("string").example("토큰 기간 만료 / 로그인 실패 / Authorization 헤더 재확인 바람 / 유효하지 않은 토큰 서명" ));
+            apiErrorSchema.addProperty("msg", new Schema<>().type("string").example("토큰 기간 만료 | 로그인 실패 | Authorization 헤더 재확인 바람 | 유효하지 않은 토큰 서명" ));
+            wrapperSchema.addProperty("apiError", apiErrorSchema);
+        }
+        else if("500".equals(responseCode)) {
+            wrapperSchema.addProperty("data", null);
+
+            Schema apiErrorSchema = new Schema<>();
+            apiErrorSchema.addProperty("status", new Schema<>().type("integer").example(500));
+            apiErrorSchema.addProperty("msg", new Schema<>().type("string").example("OPENAI_SERVER_ERROR | INTERNAL_SERVER_ERROR"));
             wrapperSchema.addProperty("apiError", apiErrorSchema);
         }
         else if("409".equals(responseCode)){

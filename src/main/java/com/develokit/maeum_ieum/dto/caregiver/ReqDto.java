@@ -25,6 +25,7 @@ public class ReqDto {
     @Getter
     @NoArgsConstructor
     @Schema(description = "요앙사 마이 페이지 이미지 수정을 위한 DTO")
+    @ToString
     public static class CaregiverImgModifyReqDto{
         private MultipartFile img;
     }

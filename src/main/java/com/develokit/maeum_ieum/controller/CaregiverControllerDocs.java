@@ -1,5 +1,6 @@
 package com.develokit.maeum_ieum.controller;
 
+import com.develokit.maeum_ieum.config.jwt.RequireAuth;
 import com.develokit.maeum_ieum.config.loginUser.LoginUser;
 import com.develokit.maeum_ieum.dto.caregiver.ReqDto;
 import com.develokit.maeum_ieum.dto.caregiver.RespDto;
@@ -16,14 +17,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.develokit.maeum_ieum.dto.assistant.ReqDto.*;
+import static com.develokit.maeum_ieum.dto.assistant.RespDto.*;
 import static com.develokit.maeum_ieum.dto.caregiver.ReqDto.*;
 import static com.develokit.maeum_ieum.dto.caregiver.RespDto.*;
 import static com.develokit.maeum_ieum.dto.elderly.ReqDto.*;
@@ -71,7 +73,7 @@ public interface CaregiverControllerDocs {
             @ApiResponse(responseCode = "401", description = "Authorization 헤더 재확인 바람", content = @Content(schema = @Schema(implementation = CreateAssistantRespDto.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = CreateAssistantRespDto.class), mediaType = "application/json"))
     })
-    ResponseEntity<?> createAssistant(@RequestBody CreateAssistantReqDto createAssistantReqDto,
+    ResponseEntity<?> createAssistant(@Valid@RequestBody CreateAssistantReqDto createAssistantReqDto,
                                       @PathVariable(name = "elderlyId")Long elderlyId,
                                       BindingResult bindingResult,
                                       @AuthenticationPrincipal LoginUser loginUser);
@@ -92,7 +94,7 @@ public interface CaregiverControllerDocs {
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = CaregiverModifyReqDto.class), mediaType = "application/json"))
 
     })
-    ResponseEntity<?>modifyCaregiverInfo(@RequestBody CaregiverModifyReqDto caregiverModifyReqDto,
+    ResponseEntity<?>modifyCaregiverInfo(@Valid@RequestBody CaregiverModifyReqDto caregiverModifyReqDto,
                                                 BindingResult bindingResult,
                                                 @AuthenticationPrincipal LoginUser loginUser);
 
@@ -104,7 +106,7 @@ public interface CaregiverControllerDocs {
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = CaregiverImgModifyReqDto.class), mediaType = "application/json"))
 
     })
-    ResponseEntity<?>modifyCaregiverImg(@ModelAttribute CaregiverImgModifyReqDto caregiverImgModifyReqDto,
+    ResponseEntity<?>modifyCaregiverImg(@RequestParam("img") MultipartFile img,
                                                @AuthenticationPrincipal LoginUser loginUser);
 
     @Operation(summary = "노인 기본 정보 수정 (이미지 제외) ", description = "노인 기본 정보 수정 기능: jwt 토큰 사용")
@@ -115,7 +117,7 @@ public interface CaregiverControllerDocs {
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = ElderlyModifyRespDto.class), mediaType = "application/json"))
 
     })
-    ResponseEntity<?>modifyElderlyInfo(@RequestBody ElderlyModifyReqDto elderlyModifyReqDto, @PathVariable(value = "elderlyId")Long elderlyId,
+    ResponseEntity<?>modifyElderlyInfo(@Valid@RequestBody ElderlyModifyReqDto elderlyModifyReqDto, @PathVariable(value = "elderlyId")Long elderlyId,
                                               BindingResult bindingResult, @AuthenticationPrincipal LoginUser loginUser);
 
     @Operation(summary = "노인 이미지 수정 ", description = "노인 이미지 수정 기능: jwt 토큰 사용")
@@ -126,8 +128,47 @@ public interface CaregiverControllerDocs {
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = ElderlyImgModifyRespDto.class), mediaType = "application/json"))
 
     })
-    ResponseEntity<?> modifyElderlyImg(@ModelAttribute ElderlyImgModifyReqDto elderlyImgModifyReqDto,
+    ResponseEntity<?> modifyElderlyImg(@RequestParam(value = "img", required = false) MultipartFile img,
                                        @PathVariable(name = "elderlyId")Long elderlyId,
+                                       BindingResult bindingResult,
                                        @AuthenticationPrincipal LoginUser loginUser);
+
+
+    @Operation(summary = "AI 어시스턴트 수정 ", description = "어시스턴트 수정 기능: jwt 토큰 사용")
+    @ApiResponses( value = {
+            @ApiResponse(responseCode = "200", description = "어시스턴트 수정 성공", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "토큰 기간 만료", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Authorization 헤더 재확인 바람", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "OPENAI_SERVER_ERROR | INTERNAL_SERVER_ERROR", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json"))
+
+    })
+    @RequireAuth
+    @PatchMapping(value = "/elderlys/{elderlyId}/assistants/{assistantId}")
+    public ResponseEntity<?> modifyAssistantInfo(@Valid@RequestBody AssistantModifyReqDto assistantModifyReqDto,
+                                                 @PathVariable(name = "elderlyId")Long elderlyId,
+                                                 @PathVariable(name = "assistantId")Long assistantId,
+                                                 BindingResult bindingResult,
+                                                 @AuthenticationPrincipal LoginUser loginUser);
+
+
+    @Operation(summary = "AI 어시스턴트 삭제 ", description = "어시스턴트 삭제 기능: jwt 토큰 사용")
+    @ApiResponses( value = {
+            @ApiResponse(responseCode = "200", description = "어시스턴트 삭제 성공", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "토큰 기간 만료", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Authorization 헤더 재확인 바람", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "OPENAI_SERVER_ERROR | INTERNAL_SERVER_ERROR", content = @Content(schema = @Schema(implementation = AssistantModifyRespDto.class), mediaType = "application/json"))
+
+    })
+    @RequireAuth
+    @DeleteMapping(value = "/elderlys/{elderlyId}/assistants/{assistantId}")
+    public ResponseEntity<?> deleteAssistant(@PathVariable(name = "elderlyId")Long elderlyId,
+                                             @PathVariable(name = "assistantId")Long assistantId,
+                                             @AuthenticationPrincipal LoginUser loginUser );
+
+
+
+
 
 }
