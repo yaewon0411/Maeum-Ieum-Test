@@ -6,6 +6,8 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -70,6 +72,14 @@ public class SwaggerConfig{
             apiErrorSchema.addProperty("msg", new Schema<>().type("string").example("토큰 기간 만료 / 로그인 실패 / Authorization 헤더 재확인 바람 / 유효하지 않은 토큰 서명" ));
             wrapperSchema.addProperty("apiError", apiErrorSchema);
         }
+        else if("409".equals(responseCode)){
+            wrapperSchema.addProperty("data", null);
+
+            Schema apiErrorSchema = new Schema<>();
+            apiErrorSchema.addProperty("status", new Schema<>().type("integer").example(409));
+            apiErrorSchema.addProperty("msg", new Schema<>().type("string").example("이미 존재하는 아이디입니다" ));
+            wrapperSchema.addProperty("apiError", apiErrorSchema);
+        }
         return wrapperSchema;
     }
 
@@ -85,10 +95,19 @@ public class SwaggerConfig{
                 .components(new Components())
                 .info(apiInfo());
     }
+    private SecurityScheme createAPIKeyScheme() {
+        return new SecurityScheme().type(SecurityScheme.Type.HTTP)
+                .bearerFormat("JWT")
+                .scheme("bearer");
+    }
+
 
     @Bean
     public OpenAPI openAPI() {
-        return createBaseOpenAPI();
+        return createBaseOpenAPI()
+                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
+                .components(new Components()
+                        .addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()));
     }
 
     public Info apiInfo(){

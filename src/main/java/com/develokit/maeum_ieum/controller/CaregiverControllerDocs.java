@@ -120,10 +120,10 @@ public interface CaregiverControllerDocs {
 
     @Operation(summary = "노인 이미지 수정 ", description = "노인 이미지 수정 기능: jwt 토큰 사용")
     @ApiResponses( value = {
-            @ApiResponse(responseCode = "200", description = "노인 이미지 수정 성공", content = @Content(schema = @Schema(implementation = ElderlyModifyRespDto.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "토큰 기간 만료", content = @Content(schema = @Schema(implementation = ElderlyModifyRespDto.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Authorization 헤더 재확인 바람", content = @Content(schema = @Schema(implementation = ElderlyModifyRespDto.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = ElderlyModifyRespDto.class), mediaType = "application/json"))
+            @ApiResponse(responseCode = "200", description = "노인 이미지 수정 성공", content = @Content(schema = @Schema(implementation = ElderlyImgModifyRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "토큰 기간 만료", content = @Content(schema = @Schema(implementation = ElderlyImgModifyRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Authorization 헤더 재확인 바람", content = @Content(schema = @Schema(implementation = ElderlyImgModifyRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = ElderlyImgModifyRespDto.class), mediaType = "application/json"))
 
     })
     ResponseEntity<?> modifyElderlyImg(@ModelAttribute ElderlyImgModifyReqDto elderlyImgModifyReqDto,
