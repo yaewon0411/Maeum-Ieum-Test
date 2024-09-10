@@ -81,8 +81,8 @@ public class ElderlyService {
 
         String imgUrl = null;
         //이미지 저장
-        if(elderlyCreateReqDto.getImgFile() != null)
-            imgUrl = s3Service.uploadImage(elderlyCreateReqDto.getImgFile());
+        if(elderlyCreateReqDto.getImg() != null)
+            imgUrl = s3Service.uploadImage(elderlyCreateReqDto.getImg());
 
         //저장
         Elderly elderlyPS = elderlyRepository.save(elderlyCreateReqDto.toEntity(caregiverPS, imgUrl));

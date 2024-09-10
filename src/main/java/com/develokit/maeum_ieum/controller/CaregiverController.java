@@ -19,6 +19,8 @@ import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +46,7 @@ public class CaregiverController implements CaregiverControllerDocs {
     private final CaregiverService caregiverService;
     private final ElderlyService elderlyService;
     private final AssistantService assistantService;
+    private final Logger log = LoggerFactory.getLogger(CaregiverController.class);
 
     @GetMapping("/check-username/{username}")
     public ResponseEntity<?> checkUsername(@PathVariable(name = "username") String username) {
@@ -58,18 +61,17 @@ public class CaregiverController implements CaregiverControllerDocs {
     @RequireAuth
     @GetMapping
     public ResponseEntity<?> getCaregiverMainInfo(
-            @RequestParam(name = "cursor",required = false) String cursor,
-            @RequestParam(name = "limit", defaultValue = "10") int limit,
+            @RequestParam(name = "cursor",required = false) @Parameter(description = "다음 데이터 조회를 위한 커서 값. 첫 요청 시 null 또는 비워둠. 다음 데이터 요청 시 이전 응답의 nextCursor를 사용") String cursor,
+            @RequestParam(name = "limit", defaultValue = "10") @Parameter(description = "한 페이지에 표시할 항목 수. 기본값은 10") int limit,
             @AuthenticationPrincipal LoginUser loginUser){
         return new ResponseEntity<>(ApiUtil.success(caregiverService.getCaregiverMainInfo(loginUser.getUsername(), cursor, limit)),HttpStatus.OK);
     }
 
     @RequireAuth
-    @PostMapping("/elderlys")
-    public ResponseEntity<ApiResult<ElderlyCreateRespDto>> createElderly(@Valid @RequestBody ElderlyCreateReqDto elderlyCreateReqDto,
+    @PostMapping(value = "/elderlys", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createElderly(@Valid @ModelAttribute ElderlyCreateReqDto elderlyCreateReqDto,
                                                                          BindingResult bindingResult,
                                                                          @AuthenticationPrincipal LoginUser loginUser) {
-
         return new ResponseEntity<>(ApiUtil.success(elderlyService.createElderly(elderlyCreateReqDto, loginUser.getCaregiver().getUsername())), HttpStatus.CREATED);
     }
     @RequireAuth

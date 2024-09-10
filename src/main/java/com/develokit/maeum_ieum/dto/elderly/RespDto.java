@@ -33,7 +33,7 @@ public class RespDto {
         public ElderlyModifyRespDto(Elderly elderly) {
             this.name = elderly.getName();
             this.gender = elderly.getGender();
-            this.birthDate = CustomUtil.BirthDateToString(elderly.getBirthDate()); // TODO xxxx년yy월ss일 -> 이렇게 반환하기!!
+            this.birthDate = CustomUtil.BirthDateToString(elderly.getBirthDate());
             this.homeAddress = elderly.getHomeAddress();
             this.organization = elderly.getOrganization();
             this.contact = elderly.getContact();
@@ -171,16 +171,14 @@ public class RespDto {
     @NoArgsConstructor
     @Getter
     public static class ElderlyCreateRespDto{
+        @Schema(description = "노인 아이디")
         private Long id;
-        private String name;
-        private String contact;
-        private LocalDateTime createDate;
+        @Schema(description = "노인 등록 날짜")
+        private LocalDateTime createdDate;
 
         public ElderlyCreateRespDto(Elderly elderly){
             this.id = elderly.getId();
-            this.name = elderly.getName();
-            this.contact = elderly.getContact();
-            this.createDate = elderly.getCreatedDate();
+            this.createdDate = elderly.getCreatedDate();
         }
     }
 }
