@@ -67,6 +67,7 @@ public class CaregiverController implements CaregiverControllerDocs {
         return new ResponseEntity<>(ApiUtil.success(caregiverService.getCaregiverMainInfo(loginUser.getUsername(), cursor, limit)),HttpStatus.OK);
     }
 
+    //노인 사용자 생성
     @RequireAuth
     @PostMapping(value = "/elderlys", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createElderly(@Valid @ModelAttribute ElderlyCreateReqDto elderlyCreateReqDto,
@@ -143,6 +144,7 @@ public class CaregiverController implements CaregiverControllerDocs {
         return new ResponseEntity<>(ApiUtil.success(assistantService.deleteAssistant(assistantId, elderlyId, loginUser.getUsername())), HttpStatus.OK);
     }
 
+    //노인 기본 정보 조회
     @RequireAuth
     @GetMapping("/elderlys/{elderlyId}")
     public ResponseEntity<?> getElderlyInfo(@PathVariable(name = "elderlyId")Long elderlyId, @AuthenticationPrincipal LoginUser loginUser){

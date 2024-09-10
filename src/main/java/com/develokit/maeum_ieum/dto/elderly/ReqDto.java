@@ -95,9 +95,9 @@ public class ReqDto {
     @Schema(description = "노인 사용자 생성 요청을 위한 DTO")
     @Getter
     @NoArgsConstructor
+    @Setter
     @AllArgsConstructor
     @Builder
-    @Setter
     public static class ElderlyCreateReqDto{
 
         @Size(min = 2)

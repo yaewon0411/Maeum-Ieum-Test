@@ -1,6 +1,7 @@
 package com.develokit.maeum_ieum.dto.elderly;
 
 import com.develokit.maeum_ieum.domain.assistant.Assistant;
+import com.develokit.maeum_ieum.domain.message.Message;
 import com.develokit.maeum_ieum.domain.user.Gender;
 import com.develokit.maeum_ieum.domain.user.caregiver.Caregiver;
 import com.develokit.maeum_ieum.domain.user.elderly.Elderly;
@@ -172,6 +173,7 @@ public class RespDto {
     }
     @NoArgsConstructor
     @Getter
+    @Schema(description = "채팅방 진입 요청에 따른 DTO")
     public static class CheckAssistantInfoRespDto{
         @Schema(description = "스레드 아이디")
         private String threadId;
@@ -188,15 +190,14 @@ public class RespDto {
             @Schema(description = "반환 채팅 수")
             private int size;
             @Schema(description = "채팅 내역")
-            private LinkedList<ChatDto> chat = new LinkedList<>();
+            private final LinkedList<ChatDto> chat = new LinkedList<>();
 
-            public ChatInfoDto(List<MessageRespDto> data){
-                this.size = data.size();
-                for (MessageRespDto messageDto : data) {
-                    this.chat.add(new ChatDto(messageDto));
+            public ChatInfoDto(List<Message> messageList){
+                this.size = messageList.size();
+                for (Message message : messageList) {
+                    this.chat.add(new ChatDto(message));
                 }
             }
-
             @NoArgsConstructor
             @Getter
             static class ChatDto{
@@ -205,19 +206,71 @@ public class RespDto {
                 @Schema(description = "답변 주체의 메시지")
                 private String content;
 
-                public ChatDto(MessageRespDto messageRespDto){
-                    this.role = messageRespDto.getRole();
-                    this.content = messageRespDto.getContent().get(0).getText().getValue().toString();
+                public ChatDto(Message message){
+                    this.role = message.getMessageType().toString();
+                    this.content = message.getContent();
                 }
             }
         }
 
-        public CheckAssistantInfoRespDto(Assistant assistant, List<MessageRespDto> messageRespDto) {
+//            @NoArgsConstructor
+//            @Getter
+//            static class ChatDto{
+//                @Schema(description = "답변 주체: USER | AI")
+//                private String role;
+//                @Schema(description = "답변 주체의 메시지")
+//                private String content;
+//
+//                public ChatDto(MessageRespDto messageRespDto){
+//                    this.role = messageRespDto.getRole();
+//                    this.content = messageRespDto.getContent().get(0).getText().getValue().toString();
+//                }
+//            }
+//        }
+
+//        @NoArgsConstructor
+//        @Getter
+//        static class ChatInfoDto{
+//            @Schema(description = "반환 채팅 수")
+//            private int size;
+//            @Schema(description = "채팅 내역")
+//            private LinkedList<ChatDto> chat = new LinkedList<>();
+//
+//            public ChatInfoDto(List<MessageRespDto> data){
+//                this.size = data.size();
+//                for (MessageRespDto messageDto : data) {
+//                    this.chat.add(new ChatDto(messageDto));
+//                }
+//            }
+//
+//            @NoArgsConstructor
+//            @Getter
+//            static class ChatDto{
+//                @Schema(description = "답변 주체: USER | AI")
+//                private String role;
+//                @Schema(description = "답변 주체의 메시지")
+//                private String content;
+//
+//                public ChatDto(MessageRespDto messageRespDto){
+//                    this.role = messageRespDto.getRole();
+//                    this.content = messageRespDto.getContent().get(0).getText().getValue().toString();
+//                }
+//            }
+//        }
+
+//        public CheckAssistantInfoRespDto(Assistant assistant, List<MessageRespDto> messageRespDto) {
+//            this.threadId = assistant.getThreadId();
+//            this.assistantName = assistant.getName();
+//            this.openAiAssistantId = assistant.getOpenAiAssistantId();
+//            if(messageRespDto != null)
+//                this.chatInfo = new ChatInfoDto(messageRespDto);
+//        }
+        public CheckAssistantInfoRespDto(Assistant assistant, List<Message> messageList) {
             this.threadId = assistant.getThreadId();
             this.assistantName = assistant.getName();
             this.openAiAssistantId = assistant.getOpenAiAssistantId();
-            if(messageRespDto != null)
-                this.chatInfo = new ChatInfoDto(messageRespDto);
+            if(!messageList.isEmpty())
+                this.chatInfo = new ChatInfoDto(messageList);
         }
     }
 

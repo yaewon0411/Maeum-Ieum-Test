@@ -31,9 +31,9 @@ public class AssistantService {
     private final ElderlyRepository elderlyRepository;
     private final CareGiverRepository careGiverRepository;
 
-    public VerifyAccessCodeRespDto verifyAccessCode(VerifyAccessCodeReqDto verifyAccessCodeReqDto){
+    public VerifyAccessCodeRespDto verifyAccessCode(String accessCode){
 
-        Assistant assistantPS = assistantRepository.findByAccessCode(verifyAccessCodeReqDto.getAccessCode())
+        Assistant assistantPS = assistantRepository.findByAccessCode(accessCode)
                 .orElseThrow(
                         () -> new CustomApiException("코드를 다시 확인해주세요", HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN)
                 );

@@ -3,6 +3,8 @@ package com.develokit.maeum_ieum.service;
 import com.amazonaws.services.s3.transfer.internal.CompleteMultipartCopy;
 import com.develokit.maeum_ieum.domain.assistant.Assistant;
 import com.develokit.maeum_ieum.domain.assistant.AssistantRepository;
+import com.develokit.maeum_ieum.domain.message.Message;
+import com.develokit.maeum_ieum.domain.message.MessageRepository;
 import com.develokit.maeum_ieum.domain.report.Report;
 import com.develokit.maeum_ieum.domain.report.ReportRepository;
 import com.develokit.maeum_ieum.domain.report.ReportType;
@@ -64,6 +66,7 @@ public class ElderlyService {
     private final AssistantRepository assistantRepository;
     private final OpenAiService openAiService;
     private final ReportRepository reportRepository;
+    private final MessageRepository messageRepository;
     private final Logger log = LoggerFactory.getLogger(CaregiverService.class);
 
     //노인 등록
@@ -164,8 +167,9 @@ public class ElderlyService {
             ListMessageRespDto listMessageRespDto = openAiService.listMessages(threadId);
             messageRespDto = listMessageRespDto.getData();
         }
+        List<Message> messageList = messageRepository.findByElderlyOrderByCreatedDate(elderlyPS);
 
-        return new CheckAssistantInfoRespDto(assistantPS, messageRespDto);
+        return new CheckAssistantInfoRespDto(assistantPS, messageList);
     }
 
 

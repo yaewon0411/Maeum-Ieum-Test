@@ -189,16 +189,18 @@ public class ThreadWebClient {
                 .flatMap(text ->
                     Mono.fromCallable(() ->
                     {
+
                         audioRequestDto.setInput(text);
-                        Message aiMessage = messageRepository.save(Message.builder()
-                                .messageType(MessageType.AI)
-                                .content(text)
-                                .elderly(elderly)
-                                .build());
 
                         Message userMessage = messageRepository.save(Message.builder()
                                 .messageType(MessageType.USER)
                                 .content(createMessageReqDto.getContent())
+                                .elderly(elderly)
+                                .build());
+
+                        Message aiMessage = messageRepository.save(Message.builder()
+                                .messageType(MessageType.AI)
+                                .content(text)
                                 .elderly(elderly)
                                 .build());
 

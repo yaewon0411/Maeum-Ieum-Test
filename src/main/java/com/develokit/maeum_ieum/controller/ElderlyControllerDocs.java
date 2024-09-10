@@ -30,7 +30,7 @@ public interface ElderlyControllerDocs {
             @ApiResponse(responseCode = "200", description = "접속 성공", content = @Content(schema = @Schema(implementation = VerifyAccessCodeRespDto.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN", content = @Content(schema = @Schema(implementation = VerifyAccessCodeRespDto.class), mediaType = "application/json")),
     })
-    ResponseEntity<?> verifyAccessCode(@RequestBody VerifyAccessCodeReqDto verifyAccessCodeReqDto);
+    ResponseEntity<?> verifyAccessCode(@PathVariable(name = "accessCode")String accessCode);
 
     @Operation(summary = "노인 메인 홈", description = "노인 메인 홈 진입 시 요청")
     @ApiResponses( value = {

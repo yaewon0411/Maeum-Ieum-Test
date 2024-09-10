@@ -49,9 +49,9 @@ public class ElderlyController implements ElderlyControllerDocs {
     private final AssistantService assistantService;
 
     //접속 코드 확인
-    @GetMapping
-    public ResponseEntity<?> verifyAccessCode(@RequestBody VerifyAccessCodeReqDto verifyAccessCodeReqDto){
-        return new ResponseEntity<>(ApiUtil.success(assistantService.verifyAccessCode(verifyAccessCodeReqDto)),HttpStatus.OK);
+    @GetMapping("/access-code/{accessCode}")
+    public ResponseEntity<?> verifyAccessCode(@PathVariable(name = "accessCode")String accessCode){
+        return new ResponseEntity<>(ApiUtil.success(assistantService.verifyAccessCode(accessCode)),HttpStatus.OK);
     }
 
 
