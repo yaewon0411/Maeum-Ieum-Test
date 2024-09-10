@@ -143,8 +143,8 @@ public interface CaregiverControllerDocs {
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 서명", content = @Content(schema = @Schema(implementation = ElderlyModifyRespDto.class), mediaType = "application/json"))
 
     })
-    ResponseEntity<?>modifyElderlyInfo(@Valid@RequestBody ElderlyModifyReqDto elderlyModifyReqDto, @PathVariable(value = "elderlyId")Long elderlyId,
-                                              BindingResult bindingResult, @AuthenticationPrincipal LoginUser loginUser);
+    ResponseEntity<?>modifyElderlyInfo(@Valid@RequestBody ElderlyModifyReqDto elderlyModifyReqDto, BindingResult bindingResult, @PathVariable(value = "elderlyId")Long elderlyId
+            , @AuthenticationPrincipal LoginUser loginUser);
 
     @Operation(summary = "노인 이미지 수정 ", description = "노인 이미지 수정 기능: jwt 토큰 사용")
     @ApiResponses( value = {
@@ -156,7 +156,6 @@ public interface CaregiverControllerDocs {
     })
     ResponseEntity<?> modifyElderlyImg(@RequestParam(value = "img", required = false) MultipartFile img,
                                        @PathVariable(name = "elderlyId")Long elderlyId,
-                                       BindingResult bindingResult,
                                        @AuthenticationPrincipal LoginUser loginUser);
 
 

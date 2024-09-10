@@ -108,9 +108,9 @@ public class CaregiverController implements CaregiverControllerDocs {
     //노인 기본 정보 수정(이미지 제외)
     @RequireAuth
     @PatchMapping(value = "/elderlys/{elderlyId}")
-    public ResponseEntity<?>modifyElderlyInfo(@Valid@RequestBody ElderlyModifyReqDto elderlyModifyReqDto, @PathVariable(value = "elderlyId")Long elderlyId,
-                                              BindingResult bindingResult, @AuthenticationPrincipal LoginUser loginUser){
-        return new ResponseEntity<>(ApiUtil.success(elderlyService.modifyElderlyInfo(elderlyModifyReqDto, elderlyId)), HttpStatus.OK);
+    public ResponseEntity<?>modifyElderlyInfo(@Valid@RequestBody ElderlyModifyReqDto elderlyModifyReqDto, BindingResult bindingResult, @PathVariable(value = "elderlyId")Long elderlyId
+                                              ,@AuthenticationPrincipal LoginUser loginUser){
+        return new ResponseEntity<>(ApiUtil.success(elderlyService.modifyElderlyInfo(elderlyModifyReqDto, elderlyId, loginUser.getCaregiver().getUsername())), HttpStatus.OK);
     }
 
     //노인 기본 정보 이미지 수정
@@ -118,7 +118,6 @@ public class CaregiverController implements CaregiverControllerDocs {
     @PatchMapping(value = "/elderlys/{elderlyId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> modifyElderlyImg(@RequestParam(value = "img", required = false) MultipartFile img,
                                                @PathVariable(name = "elderlyId")Long elderlyId,
-                                               BindingResult bindingResult,
                                                @AuthenticationPrincipal LoginUser loginUser){
         return new ResponseEntity<>(ApiUtil.success(elderlyService.modifyElderlyImg(img, elderlyId)), HttpStatus.OK);
     }

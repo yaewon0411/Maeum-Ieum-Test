@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.develokit.maeum_ieum.dto.openAi.message.RespDto.*;
+
 public class RespDto {
 
     @Getter
@@ -41,7 +43,7 @@ public class RespDto {
             this.emergencyName = elderly.getEmergencyContactInfo().getEmergencyName();
             this.emergencyContact = elderly.getEmergencyContactInfo().getEmergencyContact();
             this.relationship = elderly.getEmergencyContactInfo().getRelationship();
-            this.assistantName = elderly.getAssistant().getName();
+            this.assistantName = elderly.getAssistant()==null?null:elderly.getAssistant().getName();
             this.reportDay = elderly.getReportDay().toString();
         }
 
@@ -100,20 +102,26 @@ public class RespDto {
     @NoArgsConstructor
     @Getter
     public static class CheckAssistantInfoRespDto{
+        @Schema(description = "스레드 아이디")
         private String threadId;
+        @Schema(description = "어시스턴트 이름")
         private String assistantName;
+        @Schema(description = "OpenAI 요청을 위한 openAiAssistantId")
         private String openAiAssistantId;
+        @Schema(description = "채팅 내역")
         private ChatInfoDto chatInfo;
 
         @NoArgsConstructor
         @Getter
         static class ChatInfoDto{
+            @Schema(description = "반환 채팅 수")
             private int size;
+            @Schema(description = "채팅 내역")
             private LinkedList<ChatDto> chat = new LinkedList<>();
 
-            public ChatInfoDto(List<com.develokit.maeum_ieum.dto.openAi.message.RespDto.MessageRespDto> data){
+            public ChatInfoDto(List<MessageRespDto> data){
                 this.size = data.size();
-                for (com.develokit.maeum_ieum.dto.openAi.message.RespDto.MessageRespDto messageDto : data) {
+                for (MessageRespDto messageDto : data) {
                     this.chat.add(new ChatDto(messageDto));
                 }
             }
@@ -121,17 +129,19 @@ public class RespDto {
             @NoArgsConstructor
             @Getter
             static class ChatDto{
+                @Schema(description = "답변 주체: USER | AI")
                 private String role;
+                @Schema(description = "답변 주체의 메시지")
                 private String content;
 
-                public ChatDto(com.develokit.maeum_ieum.dto.openAi.message.RespDto.MessageRespDto messageRespDto){
+                public ChatDto(MessageRespDto messageRespDto){
                     this.role = messageRespDto.getRole();
                     this.content = messageRespDto.getContent().get(0).getText().getValue().toString();
                 }
             }
         }
 
-        public CheckAssistantInfoRespDto(Assistant assistant, List<com.develokit.maeum_ieum.dto.openAi.message.RespDto.MessageRespDto> messageRespDto) {
+        public CheckAssistantInfoRespDto(Assistant assistant, List<MessageRespDto> messageRespDto) {
             this.threadId = assistant.getThreadId();
             this.assistantName = assistant.getName();
             this.openAiAssistantId = assistant.getOpenAiAssistantId();
@@ -145,15 +155,26 @@ public class RespDto {
     @AllArgsConstructor
     @Builder
     public static class ElderlyMainRespDto{
+        @Schema(description = "요양사 이름")
         private String caregiverName;
+        @Schema(description = "요양사 연락처")
         private String caregiverContact;
+        @Schema(description = "요양사 소속 조직")
         private String caregiverOrganization;
+        @Schema(description = "요양사 프로필 사진")
         private String caregiverImgUrl;
+        @Schema(description = "노인 이름")
         private String elderlyName;
-        private LocalDate elderlyBirthdate;
+        @Schema(description = "노인 생년월일")
+        private String elderlyBirthdate;
+        @Schema(description = "노인 프로필 사진")
         private String elderlyImgUrl;
+        @Schema(description = "마지막 대화 ex) 1시간 전이면 1로 나감, 채팅 기록이 없으면 null")
         private Long lastChatDate; //마지막 대화 'n시간 전'
+        @Schema(description = "노인 이름")
         private int age;
+        @Schema(description = "AI 어시스턴트 아이디")
+        private Long assistantId; //DB 어시스턴트 아이디
         public ElderlyMainRespDto(Caregiver caregiver, Elderly elderly){
             this.caregiverContact = caregiver.getContact();
             this.caregiverImgUrl = caregiver.getImgUrl();
@@ -161,9 +182,10 @@ public class RespDto {
             this.caregiverName = caregiver.getName();
             this.elderlyName = elderly.getName();
             this.elderlyImgUrl = elderly.getImgUrl();
-            this.elderlyBirthdate = elderly.getBirthDate();
-            this.age = CustomUtil.calculateAge(elderlyBirthdate);
+            this.elderlyBirthdate = CustomUtil.BirthDateToString(elderly.getBirthDate());
+            this.age = CustomUtil.calculateAge(elderly.getBirthDate());
             this.lastChatDate = CustomUtil.calculateHoursAgo(elderly.getLastChatTime());
+            this.assistantId = elderly.getAssistant().getId();
         }
 
     }
