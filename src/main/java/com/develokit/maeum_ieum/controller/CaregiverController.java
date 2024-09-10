@@ -142,4 +142,10 @@ public class CaregiverController implements CaregiverControllerDocs {
                                              @AuthenticationPrincipal LoginUser loginUser ){
         return new ResponseEntity<>(ApiUtil.success(assistantService.deleteAssistant(assistantId, elderlyId, loginUser.getUsername())), HttpStatus.OK);
     }
+
+    @RequireAuth
+    @GetMapping("/elderlys/{elderlyId}")
+    public ResponseEntity<?> getElderlyInfo(@PathVariable(name = "elderlyId")Long elderlyId, @AuthenticationPrincipal LoginUser loginUser){
+        return new ResponseEntity<>(ApiUtil.success(caregiverService.getElderlyInfo(elderlyId, loginUser.getCaregiver().getUsername())), HttpStatus.OK);
+    }
 }

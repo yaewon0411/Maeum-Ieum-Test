@@ -24,6 +24,77 @@ public class RespDto {
 
     @Getter
     @NoArgsConstructor
+    public static class ElderlyInfoRespDto{
+
+        public ElderlyInfoRespDto(Elderly elderly) {
+            this.name = elderly.getName();
+            this.gender = elderly.getGender().toString().equals("MALE")?"남":"여";
+            this.birthDate = CustomUtil.BirthDateToString(elderly.getBirthDate());
+            this.homeAddress = elderly.getHomeAddress();
+            this.organization = elderly.getOrganization();
+            this.contact = elderly.getContact();
+            this.healthInfo = elderly.getHealthInfo();
+            this.emergencyName = elderly.getEmergencyContactInfo().getEmergencyName();
+            this.emergencyContact = elderly.getEmergencyContactInfo().getEmergencyContact();
+            this.relationship = elderly.getEmergencyContactInfo().getRelationship();
+            this.assistantName = elderly.getAssistant()!=null?elderly.getAssistant().getName():null;
+            this.reportDay = elderly.getReportDay().toString();
+        }
+
+        @Schema(description = "노인 이름: 최소 2글자 이상")
+        @Nullable
+        private String name; //이름
+
+        @Schema(description = "노인 성별: FEMALE 또는 MALE")
+        @Nullable
+        private String gender; //성별
+
+        @Schema(description = "노인 생년월일: yyyy-MM-dd 형식 준수")
+        @Nullable
+        private String birthDate; //생년월일
+
+        @Schema(description = "노인 거주 주소: 최소 1글자 이상")
+        @Nullable
+        private String homeAddress; //주거지
+
+        @Schema(description = "요양사 소속 기관명: 최소 1글자 이상")
+        @Nullable
+        private String organization; //소속 기관
+
+        @Nullable
+        @Schema(description = "노인 전화번호: 010으로 시작하는 전화번호 || 지역번호가 포함된 전화번호 형식 준수")
+        @Pattern(regexp = "^(010-\\d{4}-\\d{4})|(02-\\d{3,4}-\\d{4})|(0[3-9]\\d-\\d{3,4}-\\d{4})$", message = "유효한 전화번호 형식이 아닙니다")
+        private String contact; //연락처
+
+        @Schema(description = "노인 건강 특이 사항")
+        @Nullable
+        private String healthInfo; //특이 사항
+        //긴급 연락처
+        @Schema(description = "긴급 연락 대상 이름")
+        @Nullable
+        private String emergencyName;
+
+        @Nullable
+        @Schema(description = "긴급 연락 대상 전화번호: 010으로 시작하는 전화번호 || 지역번호가 포함된 전화번호 형식 준수")
+        @Pattern(regexp = "^(010-\\d{4}-\\d{4})|(02-\\d{3,4}-\\d{4})|(0[3-9]\\d-\\d{3,4}-\\d{4})$", message = "유효한 전화번호 형식이 아닙니다")
+        private String emergencyContact;
+
+        @Nullable
+        @Schema(description = "긴급 연락 대상과의 관계")
+        private String relationship;
+
+        @Nullable
+        @Schema(description = "AI Assistant 이름")
+        private String assistantName;
+
+        @Nullable
+        @Schema(description = "주간 보고서 생성 요일: MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY")
+        @Pattern(regexp = "^(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)$", message = "유효한 요일 형식이 아닙니다")
+        private String reportDay; //주간 보고서 생성 요일
+    }
+
+    @Getter
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class ElderlyImgModifyRespDto{
         private String imgUrl;

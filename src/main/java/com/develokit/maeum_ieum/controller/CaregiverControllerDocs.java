@@ -186,14 +186,17 @@ public interface CaregiverControllerDocs {
             @ApiResponse(responseCode = "500", description = "OPENAI_SERVER_ERROR | INTERNAL_SERVER_ERROR", content = @Content(schema = @Schema(implementation = AssistantDeleteRespDto.class), mediaType = "application/json"))
 
     })
-    @RequireAuth
-    @DeleteMapping(value = "/elderlys/{elderlyId}/assistants/{assistantId}")
     ResponseEntity<?> deleteAssistant(@PathVariable(name = "elderlyId")Long elderlyId,
                                              @PathVariable(name = "assistantId")Long assistantId,
                                              @AuthenticationPrincipal LoginUser loginUser );
 
 
-
-
+    @Operation(summary = "노인 기본 정보 조회 ", description = "노인 기본 정보 페이지 진입 시 요청: jwt 토큰 사용")
+    @ApiResponses( value = {
+            @ApiResponse(responseCode = "200", description = "요청 성공", content = @Content(schema = @Schema(implementation = ElderlyInfoRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "토큰 기간 만료", content = @Content(schema = @Schema(implementation = ElderlyInfoRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Authorization 헤더 재확인 바람", content = @Content(schema = @Schema(implementation = ElderlyInfoRespDto.class), mediaType = "application/json")),
+    })
+    ResponseEntity<?> getElderlyInfo(@PathVariable(name = "elderlyId")Long elderlyId, @AuthenticationPrincipal LoginUser loginUser);
 
 }
