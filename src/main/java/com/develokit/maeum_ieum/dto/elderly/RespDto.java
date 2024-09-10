@@ -205,10 +205,13 @@ public class RespDto {
                 private String role;
                 @Schema(description = "답변 주체의 메시지")
                 private String content;
+                @Schema(description = "메시지 발행 시간")
+                private String timeStamp;
 
                 public ChatDto(Message message){
                     this.role = message.getMessageType().toString();
                     this.content = message.getContent();
+                    this.timeStamp = CustomUtil.LocalDateTimeFormatForChatResponse(message.getCreatedDate());
                 }
             }
         }

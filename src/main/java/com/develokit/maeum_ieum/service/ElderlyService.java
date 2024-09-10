@@ -162,11 +162,6 @@ public class ElderlyService {
         }
 
         //이전 대화 기록 -> 마지막 대화 시간 정보가 있으면 이전 대화 기록 끌고오기
-        List<MessageRespDto> messageRespDto = null;
-        if(elderlyPS.getLastChatTime() != null){
-            ListMessageRespDto listMessageRespDto = openAiService.listMessages(threadId);
-            messageRespDto = listMessageRespDto.getData();
-        }
         List<Message> messageList = messageRepository.findByElderlyOrderByCreatedDate(elderlyPS);
 
         return new CheckAssistantInfoRespDto(assistantPS, messageList);
