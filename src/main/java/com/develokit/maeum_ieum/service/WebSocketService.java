@@ -10,6 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class WebSocketService {
@@ -20,7 +24,16 @@ public class WebSocketService {
     public boolean sendEmergencyRequestToCaregiver(Caregiver caregiver, EmergencyRequest emergencyRequest) {
         String destination = "/topic/emergencyRequests/" + caregiver.getId();
         try {
-            simpMessagingTemplate.convertAndSend(destination, emergencyRequest.getMessage());
+            Map<String, Object> alertMessage = new HashMap<>();
+            alertMessage.put("id", UUID.randomUUID().toString());
+            alertMessage.put("elderlyId", emergencyRequest.getElderly().getId());
+            alertMessage.put("elderlyName", emergencyRequest.getElderly().getName());
+            alertMessage.put("emergencyType", emergencyRequest.getEmergencyType().toString());
+            alertMessage.put("message", emergencyRequest.getMessage());
+            alertMessage.put("timestamp", emergencyRequest.getCreatedDate().toString());
+            alertMessage.put("caregiverId", caregiver.getId());
+
+            simpMessagingTemplate.convertAndSend(destination, alertMessage);
             log.info("긴급 알림 요양사에게 전달: "+caregiver.getId());
             return true;
         }catch (Exception e){
