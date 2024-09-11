@@ -56,6 +56,9 @@ dependencies {
 	//mySql
 	implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.3.0'
 
+	//webSocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 }
 
 dependencyManagement {
