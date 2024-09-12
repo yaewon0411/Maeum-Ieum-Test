@@ -15,14 +15,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import static com.develokit.maeum_ieum.dto.assistant.RespDto.*;
+
+import static com.develokit.maeum_ieum.dto.assistant.RespDto.VerifyAccessCodeRespDto;
 import static com.develokit.maeum_ieum.dto.elderly.RespDto.*;
-import static com.develokit.maeum_ieum.dto.emergencyRequest.ReqDto.*;
-import static com.develokit.maeum_ieum.dto.emergencyRequest.RespDto.*;
-import static com.develokit.maeum_ieum.dto.message.ReqDto.*;
-import static com.develokit.maeum_ieum.dto.message.RespDto.*;
-import static com.develokit.maeum_ieum.dto.openAi.audio.ReqDto.*;
-import static com.develokit.maeum_ieum.dto.openAi.audio.RespDto.*;
+import static com.develokit.maeum_ieum.dto.emergencyRequest.ReqDto.EmergencyRequestCreateReqDto;
+import static com.develokit.maeum_ieum.dto.emergencyRequest.RespDto.EmergencyRequestCreateRespDto;
+import static com.develokit.maeum_ieum.dto.message.ReqDto.CreateStreamMessageReqDto;
+import static com.develokit.maeum_ieum.dto.message.RespDto.CreateStreamMessageRespDto;
+import static com.develokit.maeum_ieum.dto.openAi.audio.ReqDto.CreateAudioReqDto;
+import static com.develokit.maeum_ieum.dto.openAi.audio.RespDto.CreateAudioRespDto;
 
 @Tag(name = "노인 사용자 API", description = "노인 사용자가 호출하는 API 목록")
 public interface ElderlyControllerDocs {

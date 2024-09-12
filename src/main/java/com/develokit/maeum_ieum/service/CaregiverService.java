@@ -206,7 +206,6 @@ public class CaregiverService {
     @Transactional
     public CaregiverImgModifyRespDto modifyCaregiverImg(String username, MultipartFile file){
 
-
         //요양사 가져오기
         Caregiver caregiverPS = careGiverRepository.findByUsername(username).orElseThrow(
                 () -> new CustomApiException("등록되지 않은 요양사 사용자입니다", HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND)

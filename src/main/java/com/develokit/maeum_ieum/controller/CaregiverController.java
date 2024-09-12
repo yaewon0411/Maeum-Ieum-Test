@@ -171,8 +171,10 @@ public class CaregiverController implements CaregiverControllerDocs {
     //알림 내역 조회
     @RequireAuth
     @GetMapping("/emergency-alerts")
-    public ResponseEntity<?> getEmergencyRequestList(@AuthenticationPrincipal LoginUser loginUser){
-        return new ResponseEntity<>(ApiUtil.success(emergencyRequestService.getEmergencyRequestList(loginUser.getUsername())), HttpStatus.OK);
+    public ResponseEntity<?> getEmergencyRequestList(@RequestParam(name = "page", defaultValue = "0")int page,
+                                                     @RequestParam(name = "size", defaultValue = "10")int size,
+                                                     @AuthenticationPrincipal LoginUser loginUser){
+        return new ResponseEntity<>(ApiUtil.success(emergencyRequestService.getEmergencyRequestList(loginUser.getUsername(), page, size)), HttpStatus.OK);
     }
 
     //보고서 날짜 수정

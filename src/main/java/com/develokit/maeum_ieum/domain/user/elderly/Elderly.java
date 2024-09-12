@@ -41,7 +41,7 @@ public class Elderly extends User {
     @JoinColumn(name = "caregiver_id", nullable = false)
     private Caregiver caregiver;
 
-    @OneToOne(mappedBy = "elderly", fetch=FetchType.LAZY)
+    @OneToOne(mappedBy = "elderly", fetch = FetchType.LAZY)
     private Assistant assistant;
     @Embedded
     private EmergencyContactInfo emergencyContactInfo;

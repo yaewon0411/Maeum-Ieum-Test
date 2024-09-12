@@ -260,7 +260,9 @@ public class RespDto {
         @NoArgsConstructor
         @Schema(description = "페이지 정보")
         public static class PageInfo {
+            @Schema(description = "페이지 번호")
             private int page;
+            @Schema(description = "페이지에 반환되는 수")
             private int size;
 
             public PageInfo(int page, int size) {

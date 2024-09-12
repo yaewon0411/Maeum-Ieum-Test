@@ -23,6 +23,7 @@ import static com.develokit.maeum_ieum.service.CaregiverService.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @AllArgsConstructor
+@ToString
 public class Caregiver extends User {
 
     @Id
@@ -36,13 +37,16 @@ public class Caregiver extends User {
     @Column(nullable = false, length = 60)
     private String password;
 
-    @OneToMany(mappedBy = "caregiver")
+    @OneToMany(mappedBy = "caregiver", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<Assistant> assistantList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "caregiver")
+    @OneToMany(mappedBy = "caregiver", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<Elderly> elderlyList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "caregiver") //긴급 알림 리스트
+    @OneToMany(mappedBy = "caregiver", fetch = FetchType.LAZY) //긴급 알림 리스트
+    @ToString.Exclude
     private List<EmergencyRequest> emergencyRequestList = new ArrayList<>();
 
     @Builder
