@@ -8,6 +8,7 @@ import com.develokit.maeum_ieum.dto.openAi.gpt.ReqDto;
 import com.develokit.maeum_ieum.dto.openAi.gpt.RespDto;
 import com.develokit.maeum_ieum.dto.openAi.message.RespDto.ListMessageRespDto;
 import com.develokit.maeum_ieum.ex.CustomApiException;
+import feign.FeignException;
 import lombok.*;
 
 import org.slf4j.Logger;
@@ -60,7 +61,11 @@ public class OpenAiService {
             log.debug("AI 어시스턴트 생성 완료. Response: {}", assistantRespDto);
             return assistantRespDto.getId();
 
-        }catch (Exception e){
+        }
+        catch (FeignException fe) {
+            log.error("OpenAI API 호출 과정에서 에러 발생. Status: {}, Body: {}", fe.status(), fe.contentUTF8(), fe);
+            throw new CustomApiException("OPENAI_SERVER_ERROR", fe.status(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e){
             log.error("AI Assistant 생성 과정에서 에러 발생 ", e);
             throw new CustomApiException("OPENAI_SERVER_ERROR", 500, HttpStatus.INTERNAL_SERVER_ERROR);
         }
