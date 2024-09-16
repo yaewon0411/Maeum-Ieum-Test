@@ -24,8 +24,7 @@ public class FeignHeaderConfig {
             public void apply(RequestTemplate requestTemplate) {
                 requestTemplate.header(AUTHORIZATION_HEADER, "Bearer "+OPENAI_API_KEY);
                 requestTemplate.header("OpenAI-Beta", "assistants=v2");
-                log.debug("OPEN_API_KEY : "+ OPENAI_API_KEY);
-            }
+g            }
         };
     }
 
