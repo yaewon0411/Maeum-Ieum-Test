@@ -20,6 +20,19 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     @Query("select r from Report r where r.elderly = :elderly order by r.startDate desc limit 1")
     Optional<Report> findLatestByElderly(@Param("elderly")Elderly elderly );
 
+    @Query("SELECT r FROM Report r WHERE r.startDate <= :date AND r.reportStatus = :status")
+    List<Report> findReportsReadyForProcessing(@Param("date") LocalDateTime date, @Param("status") ReportStatus status);
 
-    List<Report> findByReportDayAndReportStatus(DayOfWeek reportDay, ReportStatus reportStatus);
+    boolean existsByElderlyAndReportStatusAndStartDate(Elderly elderly, ReportStatus reportStatus, LocalDateTime startDate);
+
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Report r " +
+            "WHERE r.elderly = :elderly " +
+            "AND r.reportType = :reportType " +
+            "AND r.reportStatus = :reportStatus " +
+            "AND r.startDate >= :startDate")
+    boolean existsByElderlyAndReportTypeAndReportStatusAndStartDateGreaterThanEqual(
+            @Param("elderly") Elderly elderly,
+            @Param("reportType") ReportType reportType,
+            @Param("reportStatus") ReportStatus reportStatus,
+            @Param("startDate") LocalDateTime startDate);
 }

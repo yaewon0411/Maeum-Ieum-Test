@@ -61,7 +61,7 @@ public class OpenAiService {
             return assistantRespDto.getId();
 
         }catch (Exception e){
-            throw new CustomApiException(e.getMessage());
+            throw new CustomApiException("OPENAI_SERVER_ERROR", 500, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -70,7 +70,7 @@ public class OpenAiService {
         try{
             return threadFeignClient.createThreads(new CreateThreadReqDto());
         }catch (Exception e){
-            throw new CustomApiException(e.getMessage());
+            throw new CustomApiException("OPENAI_SERVER_ERROR", 500, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     //메시지 리스트 조회
@@ -78,7 +78,7 @@ public class OpenAiService {
         try{
             return threadFeignClient.listMessages(threadId);
         }catch (Exception e){
-            throw new CustomApiException(e.getMessage());
+            throw new CustomApiException("OPENAI_SERVER_ERROR", 500, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -95,7 +95,7 @@ public class OpenAiService {
                             .build()
             );
         }catch (Exception e){
-            throw new CustomApiException(e.getMessage());
+            throw new CustomApiException("OPENAI_SERVER_ERROR", 500, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
