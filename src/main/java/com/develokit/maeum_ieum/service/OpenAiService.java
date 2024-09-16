@@ -57,10 +57,11 @@ public class OpenAiService {
                     openAiCreateAssistantReqDto.getDescription()
                     )
             );
-            log.debug("어시스턴트 생성!!");
+            log.debug("AI 어시스턴트 생성 완료. Response: {}", assistantRespDto);
             return assistantRespDto.getId();
 
         }catch (Exception e){
+            log.error("AI Assistant 생성 과정에서 에러 발생 ", e);
             throw new CustomApiException("OPENAI_SERVER_ERROR", 500, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
