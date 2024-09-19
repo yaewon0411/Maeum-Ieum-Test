@@ -1,4 +1,4 @@
-package com.develokit.maeum_ieum.controller;
+package com.develokit.maeum_ieum.controller.caregiver;
 
 import com.develokit.maeum_ieum.config.jwt.RequireAuth;
 import com.develokit.maeum_ieum.config.loginUser.LoginUser;

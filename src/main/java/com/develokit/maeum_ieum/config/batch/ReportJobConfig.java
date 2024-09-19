@@ -21,10 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.develokit.maeum_ieum.service.report.ReportProcessor.*;
@@ -88,10 +85,10 @@ public class ReportJobConfig {
     @Bean
     @Qualifier("monthlyReportGenerationStep")
     public Step monthlyReportGenerationStep(@Qualifier("monthlyReportReader") ItemReader<Report> monthlyReportReader,
-                                            ItemProcessor<Report, ReportProcessResult> reportProcessor,
-                                            ItemWriter<ReportProcessResult> reportWriter) {
+                                            ItemProcessor<Report, Report> reportProcessor,
+                                            ItemWriter<Report> reportWriter) {
         return new StepBuilder("monthlyReportGenerationStep", jobRepository)
-                .<Report, ReportProcessResult>chunk(100, transactionManager)
+                .<Report, Report>chunk(100, transactionManager)
                 .reader(monthlyReportReader)
                 .processor(reportProcessor)
                 .writer(reportWriter)
@@ -102,10 +99,10 @@ public class ReportJobConfig {
     @Bean
     @Qualifier("weeklyReportGenerationStep")
     public Step weeklyReportGenerationStep(@Qualifier("weeklyReportReader") ItemReader<Report> weeklyReportReader,
-                                           ItemProcessor<Report, ReportProcessResult> reportProcessor,
-                                           ItemWriter<ReportProcessResult> reportWriter) {
+                                           ItemProcessor<Report, Report> reportProcessor,
+                                           ItemWriter<Report> reportWriter) {
         return new StepBuilder("weeklyReportGenerationStep", jobRepository)
-                .<Report, ReportProcessResult>chunk(100, transactionManager)
+                .<Report, Report>chunk(100, transactionManager)
                 .reader(weeklyReportReader)
                 .processor(reportProcessor)
                 .writer(reportWriter)

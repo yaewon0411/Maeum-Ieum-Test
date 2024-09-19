@@ -19,14 +19,13 @@ import static com.develokit.maeum_ieum.service.report.ReportProcessor.*;
 
 @Component
 @RequiredArgsConstructor
-public class ReportProcessor implements ItemProcessor<Report, ReportProcessResult> {
+public class ReportProcessor implements ItemProcessor<Report, Report> {
 
     private final ReportService reportService;
     private final Logger log = LoggerFactory.getLogger(ReportProcessor.class);
 
     @Override
-    public ReportProcessResult process(Report report) throws Exception {
-        ReportProcessResult result = new ReportProcessResult();
+    public Report process(Report report) throws Exception {
         try {
             log.info("보고서 분석 작업 시작: {}", report.getElderly().getId());
             //보고서 상태 변경: 대기 -> 분석 진행 중
@@ -40,8 +39,6 @@ public class ReportProcessor implements ItemProcessor<Report, ReportProcessResul
             report.updateReportStatus(ReportStatus.COMPLETED);
             report.updateEndDate(today);
 
-
-            result.setCompletedReport(report);
             log.info("보고서 결과 반영 성공: {}", report.getElderly().getId());
 
         }catch (Exception e){
@@ -50,13 +47,7 @@ public class ReportProcessor implements ItemProcessor<Report, ReportProcessResul
             //스프링 배치에 에러 던지는 방향으로 수정할 수 있을듯 (재시작 로직에 대한 요청같은)
             throw new CustomApiException("보고서 배치 처리 중 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return result;
-    }
-    @Getter
-    @Setter
-    public static class ReportProcessResult{
-        private Report completedReport;
-        //private Report nextReport;
+        return report;
     }
 
 }

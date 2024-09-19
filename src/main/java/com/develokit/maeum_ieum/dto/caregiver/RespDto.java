@@ -139,7 +139,7 @@ public class RespDto {
                 this.assistantId = hasAssistant?elderly.getAssistant().getId():null;
                 this.assistantName =hasAssistant?elderly.getAssistant().getName():null;
                 this.img = elderly.getImgUrl();
-                this.accessCode = hasAssistant?elderly.getAssistant().getAccessCode():"AI 어시스턴트를 생성해주세요";
+                this.accessCode = hasAssistant?elderly.getAccessCode():"AI 어시스턴트를 생성해주세요";
                 this.homeAddress = elderly.getHomeAddress();
             }
 

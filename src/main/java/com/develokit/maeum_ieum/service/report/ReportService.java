@@ -33,9 +33,12 @@ public class ReportService {
     //PENDING 상태의 빈 보고서가 없으면 -> 해당 주의 주간 보고서 생성
     @Transactional
     public void createWeeklyEmptyReports(LocalDateTime date) {
+        LocalDateTime oneWeekAgo = date.minusWeeks(1);
+
         List<Elderly> eligibleElderly = elderlyRepository.findByReportDay(date.getDayOfWeek());
         for (Elderly elderly : eligibleElderly) {
-            if (!reportRepository.existsByElderlyAndReportStatusAndStartDate(elderly, ReportStatus.PENDING, date)) {
+            if (!reportRepository.existsByElderlyAndReportTypeAndReportStatusAndStartDateInLastWeek(
+                    elderly, ReportType.WEEKLY, ReportStatus.PENDING, oneWeekAgo, date)) {
                 Report newReport = Report.builder()
                         .elderly(elderly)
                         .reportType(ReportType.WEEKLY)
@@ -57,7 +60,7 @@ public class ReportService {
         List<Elderly> allElderly = elderlyRepository.findAll();
         for (Elderly elderly : allElderly) {
             if (!reportRepository.existsByElderlyAndReportTypeAndReportStatusAndStartDateGreaterThanEqual(
-                    elderly, ReportType.MONTHLY, ReportStatus.PENDING, oneMonthAgo)) {
+                    elderly, ReportType.MONTHLY, ReportStatus.PENDING, oneMonthAgo, date)) {
                 Report newReport = Report.builder()
                         .elderly(elderly)
                         .reportType(ReportType.MONTHLY)
