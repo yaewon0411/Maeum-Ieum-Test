@@ -178,8 +178,11 @@ public class CaregiverController implements CaregiverControllerDocs {
     public ResponseEntity<?> getAssistantInfo(@PathVariable(name = "elderlyId")Long elderlyId,
                                                  @PathVariable(name = "assistantId")Long assistantId,
                                                  @AuthenticationPrincipal LoginUser loginUser){
-        return new ResponseEntity<>(ApiUtil.success(assistantService.getAssistantInfo(elderlyId, assistantId)), HttpStatus.OK);
+        return new ResponseEntity<>(ApiUtil.success(assistantService.getAssistantInfo(elderlyId, assistantId, loginUser.getCaregiver().getUsername())), HttpStatus.OK);
     }
+
+    //노인 사용자 보고서 조회
+
 
 
 }

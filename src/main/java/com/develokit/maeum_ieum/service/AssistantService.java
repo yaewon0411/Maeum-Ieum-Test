@@ -163,11 +163,15 @@ public class AssistantService {
         return new CreateAssistantRespDto(assistantPS, accessCode);
     }
 
-    public AssistantInfoRespDto getAssistantInfo(Long elderlyId, Long assistantId){
+    public AssistantInfoRespDto getAssistantInfo(Long elderlyId, Long assistantId, String username){
 
         //존재하는 사용자인지 검사
         Elderly elderlyPS = elderlyRepository.findById(elderlyId)
                 .orElseThrow(() -> new CustomApiException("존재하지 않는 노인 사용자 입니다", HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND));
+
+        //노인 사용자가 현재 접속한 요양사의 관리 대상인지 검사
+        if(!elderlyPS.getCaregiver().getUsername().equals(username))
+            throw new CustomApiException("관리 대상이 아닙니다", HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN);
 
         //어시스턴트 가져오기
         Assistant assistantPS = assistantRepository.findById(assistantId)

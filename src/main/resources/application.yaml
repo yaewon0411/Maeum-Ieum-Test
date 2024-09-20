@@ -36,6 +36,9 @@ spring:
     azure:
       openai:
         api-key: ${OPENAI_KEY}
+  batch:
+    jdbc:
+      initialize-schema: always
 
 
 logging:
