@@ -1,24 +1,17 @@
 package com.develokit.maeum_ieum.service;
 
-import com.develokit.maeum_ieum.domain.assistant.Assistant;
-import com.develokit.maeum_ieum.domain.assistant.AssistantRepository;
 import com.develokit.maeum_ieum.domain.user.caregiver.CareGiverRepository;
 import com.develokit.maeum_ieum.domain.user.caregiver.Caregiver;
 import com.develokit.maeum_ieum.domain.user.elderly.Elderly;
 import com.develokit.maeum_ieum.domain.user.elderly.ElderlyRepository;
-import com.develokit.maeum_ieum.dto.caregiver.RespDto.JoinRespDto;
-import com.develokit.maeum_ieum.dto.openAi.assistant.RespDto.CreateAssistantRespDto;
+import com.develokit.maeum_ieum.dto.caregiver.RespDto.*;
 import com.develokit.maeum_ieum.ex.CustomApiException;
-import com.develokit.maeum_ieum.util.CustomAccessCodeGenerator;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.Pattern;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,15 +22,12 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-import static com.develokit.maeum_ieum.dto.assistant.ReqDto.*;
-import static com.develokit.maeum_ieum.dto.assistant.RespDto.*;
-import static com.develokit.maeum_ieum.dto.caregiver.ReqDto.*;
+import static com.develokit.maeum_ieum.dto.assistant.ReqDto.AssistantMandatoryRuleReqDto;
+import static com.develokit.maeum_ieum.dto.assistant.RespDto.AssistantMandatoryRuleRespDto;
+import static com.develokit.maeum_ieum.dto.caregiver.ReqDto.CaregiverModifyReqDto;
+import static com.develokit.maeum_ieum.dto.caregiver.ReqDto.JoinReqDto;
 import static com.develokit.maeum_ieum.dto.caregiver.RespDto.*;
-import static com.develokit.maeum_ieum.dto.elderly.RespDto.*;
-import static com.develokit.maeum_ieum.dto.openAi.assistant.ReqDto.*;
-import static com.develokit.maeum_ieum.dto.openAi.assistant.RespDto.*;
-import static com.develokit.maeum_ieum.dto.openAi.gpt.RespDto.*;
-import static com.develokit.maeum_ieum.dto.openAi.gpt.RespDto.CreateGptMessageRespDto.*;
+import static com.develokit.maeum_ieum.dto.elderly.RespDto.ElderlyInfoRespDto;
 
 @Service
 @RequiredArgsConstructor
@@ -100,13 +90,16 @@ public class CaregiverService {
         );
 
         //cursor가 null이면 첫 페이지, 아니면 해당 커서 이후의 데이터를 가져옴 -> 최근 생성된 순으로 반환
-        List<Elderly> elderlyList = elderlyRepository
-                .findByCaregiverIdAndIdAfter(caregiverPS.getId(),
-                        decodeCursor(cursor),
-                        PageRequest.of(0, limit + 1, Sort.by("id").descending()));
+        Long cursorId = cursor != null ? decodeCursor(cursor) : Long.MAX_VALUE;
+
+        List<Elderly> elderlyList = elderlyRepository.findByCaregiverIdAndIdLessThanEqual(
+                caregiverPS.getId(),
+                cursorId,
+                PageRequest.of(0, limit + 1, Sort.by("id").descending())
+        );
 
         String nextCursor = null;
-        if(elderlyList.size()>limit){
+        if (elderlyList.size() > limit) {
             nextCursor = encodeCursor(elderlyList.get(limit).getId());
             elderlyList = elderlyList.subList(0, limit);
         }
