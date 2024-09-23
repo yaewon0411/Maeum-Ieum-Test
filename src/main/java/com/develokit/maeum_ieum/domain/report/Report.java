@@ -100,6 +100,10 @@ public class Report extends BaseEntity {
         this.qualitativeAnalysis = qualitativeAnalysis;
     }
 
+    public void setMemo(String memo){
+        this.memo = memo;
+    }
+
     public Report(Elderly elderly, LocalDateTime startDate, LocalDateTime endDate, ReportType reportType){
         this.elderly = elderly;
         this.startDate = startDate;
