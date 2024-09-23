@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
+import java.net.MalformedURLException;
+
 import static com.develokit.maeum_ieum.dto.assistant.ReqDto.*;
 import static com.develokit.maeum_ieum.dto.assistant.RespDto.*;
 import static com.develokit.maeum_ieum.dto.caregiver.ReqDto.*;
@@ -276,4 +278,14 @@ public interface CaregiverControllerDocs {
                                        @RequestBody @Valid com.develokit.maeum_ieum.dto.report.ReqDto.ReportMemoCreateReqDto reportMemoCreateReqDto,
                                        BindingResult bindingResult,
                                        @AuthenticationPrincipal LoginUser loginUser);
+
+
+    @Operation(summary = "노인 사용자 삭제 ", description = "노인 사용자 삭제 시 요청: jwt 토큰 사용")
+    @ApiResponses( value = {
+            @ApiResponse(responseCode = "200", description = "요청 성공", content = @Content(schema = @Schema(implementation = ElderlyDeleteRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "토큰 기간 만료", content = @Content(schema = @Schema(implementation = ElderlyDeleteRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR", content = @Content(schema = @Schema(implementation = ElderlyDeleteRespDto.class), mediaType = "application/json")),
+    })
+    ResponseEntity<?> deleteElderly(@PathVariable(name = "elderlyId")Long elderlyId,
+                                    @AuthenticationPrincipal LoginUser loginUser) throws MalformedURLException;
 }

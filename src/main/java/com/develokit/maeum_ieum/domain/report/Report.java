@@ -67,7 +67,7 @@ public class Report extends BaseEntity {
     private SupportNeedsIndicator supportNeedsIndicator; //필요 지원 지표
 
     @Builder
-    public Report(Elderly elderly, ReportType reportType, LocalDateTime startDate, LocalDateTime endDate, String quantitativeAnalysis, String qualitativeAnalysis,  String memo, ReportStatus reportStatus, DayOfWeek reportDay) {
+    public Report(Long id, Elderly elderly, ReportType reportType, LocalDateTime startDate, LocalDateTime endDate, String quantitativeAnalysis, String qualitativeAnalysis,  String memo, ReportStatus reportStatus, DayOfWeek reportDay) {
         this.elderly = elderly;
         this.reportType = reportType;
         this.startDate = startDate;
@@ -77,6 +77,7 @@ public class Report extends BaseEntity {
         this.memo = memo;
         this.reportStatus = reportStatus;
         this.reportDay = reportDay;
+        this.id = id;
     }
     public void modifyStartDateAndReportDay(LocalDateTime localDateTime, DayOfWeek dayOfWeek){
         this.startDate = localDateTime;

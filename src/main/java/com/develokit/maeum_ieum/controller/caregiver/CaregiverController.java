@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
+import java.net.MalformedURLException;
+
 import static com.develokit.maeum_ieum.dto.assistant.ReqDto.*;
 import static com.develokit.maeum_ieum.dto.assistant.RespDto.*;
 import static com.develokit.maeum_ieum.dto.caregiver.ReqDto.*;
@@ -286,6 +288,13 @@ public class CaregiverController implements CaregiverControllerDocs {
                                               BindingResult bindingResult,
                                               @AuthenticationPrincipal LoginUser loginUser){
         return new ResponseEntity<>(ApiUtil.success(reportService.createReportMemo(reportMemoCreateReqDto, elderlyId, reportId)),HttpStatus.OK);
+    }
+
+    //노인 삭제
+    @DeleteMapping("/elderlys/{elderlyId}")
+    public ResponseEntity<?> deleteElderly(@PathVariable(name = "elderlyId")Long elderlyId,
+                                           @AuthenticationPrincipal LoginUser loginUser) throws MalformedURLException {
+        return new ResponseEntity<>(ApiUtil.success(elderlyService.deleteElderly(elderlyId, loginUser.getCaregiver().getUsername())), HttpStatus.OK);
     }
 
 
