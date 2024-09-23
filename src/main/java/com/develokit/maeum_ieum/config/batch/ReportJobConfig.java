@@ -3,7 +3,6 @@ package com.develokit.maeum_ieum.config.batch;
 import com.develokit.maeum_ieum.domain.report.Report;
 import com.develokit.maeum_ieum.domain.report.ReportStatus;
 import com.develokit.maeum_ieum.domain.report.ReportType;
-import com.develokit.maeum_ieum.service.report.ReportGenerationScheduler;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -65,7 +64,7 @@ public class ReportJobConfig {
         return new JpaPagingItemReaderBuilder<Report>()
                 .name("monthlyReportReader")
                 .entityManagerFactory(entityManagerFactory)
-                .queryString("select r from Report r where r.reportType = :reportType and r.reportStatus = :reportStatus and date_format(r.startDate, '%Y-%m-%d') = :targetDate")
+                .queryString("select r from Report r where r.reportType = :reportType and r.reportStatus = :reportStatus and formatdatetime(r.startDate, 'yyyy-MM-dd') = :targetDate")
                 .parameterValues(Map.of(
                         "reportType", ReportType.MONTHLY,
                         "reportStatus", ReportStatus.PENDING,
@@ -86,7 +85,7 @@ public class ReportJobConfig {
         try {
             today = LocalDate.parse(dateString);
         } catch (DateTimeParseException e) {
-            log.error("Failed to parse date: {}", dateString, e);
+            log.error("날짜 파싱 과정 중 오류 발생: {}", dateString, e);
             throw new IllegalArgumentException("Invalid date format. Expected format: YYYY-MM-DD", e);
         }
         LocalDate oneWeekAgo = today.minusWeeks(1);
@@ -95,7 +94,7 @@ public class ReportJobConfig {
         return new JpaPagingItemReaderBuilder<Report>()
                 .name("weeklyReportReader")
                 .entityManagerFactory(entityManagerFactory)
-                .queryString("SELECT r FROM Report r WHERE r.reportType = :reportType AND r.reportStatus = :reportStatus AND date_format(r.startDate, '%Y-%m-%d') = :targetDate")
+                .queryString("SELECT r FROM Report r WHERE r.reportType = :reportType AND r.reportStatus = :reportStatus AND formatdatetime(r.startDate, 'yyyy-MM-dd') = :targetDate")
                 .parameterValues(Map.of(
                         "reportType", ReportType.WEEKLY,
                         "reportStatus", ReportStatus.PENDING,

@@ -1,17 +1,24 @@
 package com.develokit.maeum_ieum.service;
 
+import com.develokit.maeum_ieum.domain.assistant.Assistant;
+import com.develokit.maeum_ieum.domain.assistant.AssistantRepository;
 import com.develokit.maeum_ieum.domain.user.caregiver.CareGiverRepository;
 import com.develokit.maeum_ieum.domain.user.caregiver.Caregiver;
 import com.develokit.maeum_ieum.domain.user.elderly.Elderly;
 import com.develokit.maeum_ieum.domain.user.elderly.ElderlyRepository;
-import com.develokit.maeum_ieum.dto.caregiver.RespDto.*;
+import com.develokit.maeum_ieum.dto.caregiver.RespDto.JoinRespDto;
+import com.develokit.maeum_ieum.dto.openAi.assistant.RespDto.CreateAssistantRespDto;
 import com.develokit.maeum_ieum.ex.CustomApiException;
-import lombok.RequiredArgsConstructor;
+import com.develokit.maeum_ieum.util.CustomAccessCodeGenerator;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +29,15 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-import static com.develokit.maeum_ieum.dto.assistant.ReqDto.AssistantMandatoryRuleReqDto;
-import static com.develokit.maeum_ieum.dto.assistant.RespDto.AssistantMandatoryRuleRespDto;
-import static com.develokit.maeum_ieum.dto.caregiver.ReqDto.CaregiverModifyReqDto;
-import static com.develokit.maeum_ieum.dto.caregiver.ReqDto.JoinReqDto;
+import static com.develokit.maeum_ieum.dto.assistant.ReqDto.*;
+import static com.develokit.maeum_ieum.dto.assistant.RespDto.*;
+import static com.develokit.maeum_ieum.dto.caregiver.ReqDto.*;
 import static com.develokit.maeum_ieum.dto.caregiver.RespDto.*;
-import static com.develokit.maeum_ieum.dto.elderly.RespDto.ElderlyInfoRespDto;
+import static com.develokit.maeum_ieum.dto.elderly.RespDto.*;
+import static com.develokit.maeum_ieum.dto.openAi.assistant.ReqDto.*;
+import static com.develokit.maeum_ieum.dto.openAi.assistant.RespDto.*;
+import static com.develokit.maeum_ieum.dto.openAi.gpt.RespDto.*;
+import static com.develokit.maeum_ieum.dto.openAi.gpt.RespDto.CreateGptMessageRespDto.*;
 
 @Service
 @RequiredArgsConstructor
@@ -188,9 +198,18 @@ public class CaregiverService {
     }
 
 
-    // AI 필수 규칙 자동 생성
+    // TODO AI 필수 규칙 자동 생성 -> WebFlux
     public Mono<AssistantMandatoryRuleRespDto> createAutoMandatoryRule(AssistantMandatoryRuleReqDto assistantMandatoryRuleReqdto){
-        return openAiService.createGptMessage(assistantMandatoryRuleReqdto);
+        return openAiService.createGptMessage(assistantMandatoryRuleReqdto)
+                .doOnError(CustomApiException.class, e ->{
+                    log.error("AI 필수 규칙 자동 완성 응답 DTO 반환 중 오류 발생: "+e.getMessage());
+                    throw new CustomApiException("AI 필수 규칙 자동 완성 응답 DTO 반환 중 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
+                });
+    }
+    // TODO AI 필수 규칙 자동 생성 -> Servlet
+
+    public AssistantMandatoryRuleRespDto createAutoMandatoryRuleWithFeign(AssistantMandatoryRuleReqDto assistantMandatoryRuleReqdto){
+        return openAiService.createGptMessageWithFeign(assistantMandatoryRuleReqdto);
     }
 
 
