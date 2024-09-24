@@ -5,22 +5,12 @@ import com.develokit.maeum_ieum.domain.report.ReportRepository;
 import com.develokit.maeum_ieum.domain.report.ReportStatus;
 import com.develokit.maeum_ieum.domain.report.ReportType;
 import com.develokit.maeum_ieum.domain.report.indicator.HealthStatusIndicator;
-import com.develokit.maeum_ieum.domain.report.indicator.ReportIndicator;
 import com.develokit.maeum_ieum.domain.user.elderly.Elderly;
 import com.develokit.maeum_ieum.domain.user.elderly.ElderlyRepository;
-import com.develokit.maeum_ieum.dto.report.ReqDto;
 import com.develokit.maeum_ieum.ex.CustomApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonSyntaxException;
-import io.swagger.v3.core.util.Json;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.bouncycastle.pqc.crypto.ExchangePair;
-import org.hibernate.validator.constraints.Length;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -31,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 import static com.develokit.maeum_ieum.dto.report.ReqDto.*;
 import static com.develokit.maeum_ieum.dto.report.RespDto.*;
@@ -45,8 +34,10 @@ public class ReportService {
     private final ElderlyRepository elderlyRepository;
     private final Logger log = LoggerFactory.getLogger(ReportService.class);
 
-    //TODO 월간 보고서 정량적 평가 조회
-    public MonthlyReportQuantitativeAnalysisRespDto getMonthlyReportQuantitativeAnalysis(Long elderlyId, Long reportId){
+
+
+    //TODO 월간 보고서 정량적 & 정성적 평가 조회
+    public MonthlyReportAnalysisRespDto getMonthlyReportQuantitativeAnalysis(Long elderlyId, Long reportId){
 
         //노인 검증
         Elderly elderlyPS = elderlyRepository.findById(elderlyId).orElseThrow(
@@ -63,15 +54,15 @@ public class ReportService {
             throw new CustomApiException("서버 내부 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
 
         try{
-            return new MonthlyReportQuantitativeAnalysisRespDto(reportPS);
+            return new MonthlyReportAnalysisRespDto(reportPS, elderlyPS);
         }catch (JsonSyntaxException e){
             log.error("월간 보고서 정량적 분석 결과 파싱 중 오류 발생: ", e);
             throw new CustomApiException("월간 보고서 정량적 분석 결과 파싱 중 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    //주간 보고서 정량적 평가 조회
-    public WeeklyReportQuantitativeAnalysisRespDto getWeeklyReportQuantitativeAnalysis(Long elderlyId, Long reportId){
+    //주간 보고서 정량적 & 정성적 평가 조회
+    public WeeklyReportAnalysisRespDto getWeeklyReportQuantitativeAnalysis(Long elderlyId, Long reportId){
 
         //노인 검증
         Elderly elderlyPS = elderlyRepository.findById(elderlyId).orElseThrow(
@@ -88,7 +79,7 @@ public class ReportService {
             throw new CustomApiException("서버 내부 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
 
         try{
-            return new WeeklyReportQuantitativeAnalysisRespDto(reportPS);
+            return new WeeklyReportAnalysisRespDto(reportPS, elderlyPS);
         }catch (JsonSyntaxException e){
             log.error("주간 보고서 정량적 분석 결과 파싱 중 오류 발생: ", e);
             throw new CustomApiException("주간 보고서 정량적 분석 결과 파싱 중 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);

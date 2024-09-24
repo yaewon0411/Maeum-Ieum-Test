@@ -1,11 +1,9 @@
 package com.develokit.maeum_ieum.dto.report;
 
 import com.develokit.maeum_ieum.domain.report.Report;
+import com.develokit.maeum_ieum.domain.user.elderly.Elderly;
 import com.develokit.maeum_ieum.util.CustomUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,9 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 
 public class RespDto {
+
 
     @Getter
     @NoArgsConstructor
@@ -56,11 +54,16 @@ public class RespDto {
     }
     @NoArgsConstructor
     @Getter
-    @Schema(description = "월간 보고서 정량적 평가 조회 반환 DTO")
-    public static class MonthlyReportQuantitativeAnalysisRespDto{
+    @Schema(description = "월간 보고서 정량적 & 정성적 평가 조회 반환 DTO")
+    public static class MonthlyReportAnalysisRespDto {
         private static final Gson gson = new Gson();
-        private static final ObjectMapper om = new ObjectMapper();
-        private static final Logger log = LoggerFactory.getLogger(MonthlyReportQuantitativeAnalysisRespDto.class);
+        private static final Logger log = LoggerFactory.getLogger(MonthlyReportAnalysisRespDto.class);
+
+        @Schema(description = "정성적 분석 결과")
+        private String qualitativeAnalysis;
+
+        @Schema(description = "노인 이름")
+        private String elderlyName;
 
         @Schema(description = "월간 보고서 분석 시작일", example =  "2024.09")
         private String startDate;
@@ -92,7 +95,9 @@ public class RespDto {
         @Schema(description = "정량적 분석 결과")
         private QuantitativeAnalysis quantitativeAnalysis;
 
-        public MonthlyReportQuantitativeAnalysisRespDto(Report report){
+        public MonthlyReportAnalysisRespDto(Report report, Elderly elderly){
+            this.elderlyName = elderly.getName();
+            this.qualitativeAnalysis = report.getQualitativeAnalysis();
             this.startDate = CustomUtil.LocalDateTimeToMonthlyReportPublishedDate(report.getStartDate());
             this.memo = report.getMemo();
             this.healthStatus = report.getHealthStatusIndicator().getDescription();
@@ -108,18 +113,22 @@ public class RespDto {
             }catch(JsonSyntaxException e){
                 log.error("JSON 파싱 중 오류 발생: 구문 오류 ", e);
             }
-
         }
     }
 
     @NoArgsConstructor
     @Getter
-    @Schema(description = "주간 보고서 정량적 평가 조회 반환 DTO")
-    public static class WeeklyReportQuantitativeAnalysisRespDto{
+    @Schema(description = "주간 보고서 정량적 & 정성적 평가 조회 반환 DTO")
+    public static class WeeklyReportAnalysisRespDto {
         private static final Gson gson = new Gson();
 
-        private static final ObjectMapper om = new ObjectMapper();
-        private static final Logger log = LoggerFactory.getLogger(WeeklyReportQuantitativeAnalysisRespDto.class);
+        private static final Logger log = LoggerFactory.getLogger(WeeklyReportAnalysisRespDto.class);
+
+        @Schema(description = "정성적 분석 결과")
+        private String qualitativeAnalysis;
+
+        @Schema(description = "노인 이름")
+        private String elderlyName;
 
         @Schema(description = "주간 보고서 분석 시작일", example =  "2024.09.20.")
         private String startDate;
@@ -156,7 +165,11 @@ public class RespDto {
         @Schema(description = "정량적 분석 결과")
         private QuantitativeAnalysis quantitativeAnalysis;
 
-        public WeeklyReportQuantitativeAnalysisRespDto(Report report){
+
+
+        public WeeklyReportAnalysisRespDto(Report report, Elderly elderly){
+            this.elderlyName = elderly.getName();
+            this.qualitativeAnalysis = report.getQualitativeAnalysis();
             this.reportDay = report.getReportDay()==null?null:CustomUtil.DayOfWeekToString(report.getReportDay()); //(수)
             this.startDate = CustomUtil.LocalDateTimeToWeeklyReportCreatedDate(report.getStartDate());
             this.endDate = CustomUtil.LocalDateTimeToWeeklyReportPublishedDate(report.getEndDate(), 1); //일자를 하나 차감해야 함
