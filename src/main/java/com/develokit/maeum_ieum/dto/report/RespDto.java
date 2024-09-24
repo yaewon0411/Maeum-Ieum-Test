@@ -2,13 +2,181 @@ package com.develokit.maeum_ieum.dto.report;
 
 import com.develokit.maeum_ieum.domain.report.Report;
 import com.develokit.maeum_ieum.util.CustomUtil;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 public class RespDto {
+
+    @Getter
+    @NoArgsConstructor
+    @Schema(description = "보고서 정량적 평가 지표")
+    @ToString
+    public static class QuantitativeAnalysis {
+
+        @JsonProperty("healthStatusIndicator")
+        @Schema(description = "건강 상태 지표 정량적 분석 결과")
+        private String healthStatusIndicator;
+
+        @JsonProperty("activityLevelIndicator")
+        @Schema(description = "활동 수준 지표 정량적 분석 결과")
+        private String activityLevelIndicator;
+
+        @JsonProperty("cognitiveFunctionIndicator")
+        @Schema(description = "인지 기능 지표 정량적 분석 결과")
+        private String cognitiveFunctionIndicator;
+
+        @JsonProperty("lifeSatisfactionIndicator")
+        @Schema(description = "생활 만족도 지표 정량적 분석 결과")
+        private String lifeSatisfactionIndicator;
+
+        @JsonProperty("psychologicalStabilityIndicator")
+        @Schema(description = "심리적 안정 지표 정량적 분석 결과")
+        private String psychologicalStabilityIndicator;
+
+        @JsonProperty("socialConnectivityIndicator")
+        @Schema(description = "사회적 연결성 수준 지표 정량적 분석 결과")
+        private String socialConnectivityIndicator;
+
+        @JsonProperty("supportNeedsIndicator")
+        @Schema(description = "필요 지원 지표 정량적 분석 결과")
+        private String supportNeedsIndicator;
+    }
+    @NoArgsConstructor
+    @Getter
+    @Schema(description = "월간 보고서 정량적 평가 조회 반환 DTO")
+    public static class MonthlyReportQuantitativeAnalysisRespDto{
+        private static final Gson gson = new Gson();
+        private static final ObjectMapper om = new ObjectMapper();
+        private static final Logger log = LoggerFactory.getLogger(MonthlyReportQuantitativeAnalysisRespDto.class);
+
+        @Schema(description = "월간 보고서 분석 시작일", example =  "2024.09")
+        private String startDate;
+
+        @Schema(description = "보고서 메모")
+        private String memo;
+
+        @Schema(description = "건강 상태 지표", example =  "그저 그래요")
+        private String healthStatus;
+
+        @Schema(description = "활동 수준 지표", example =  "그저 그래요")
+        private String activityLevel;
+
+        @Schema(description = "인지 기능 지표", example =  "그저 그래요")
+        private String cognitiveFunction;
+
+        @Schema(description = "생활 만족도 지표", example =  "그저 그래요")
+        private String lifeSatisfaction;
+
+        @Schema(description = "심리적 안정 지표", example =  "그저 그래요")
+        private String psychologicalStability;
+
+        @Schema(description = "사회적 연결성 지표", example =  "그저 그래요")
+        private String socialConnectivity;
+
+        @Schema(description = "필요 지원 지표", example =  "그저 그래요")
+        private String supportNeeds;
+
+        @Schema(description = "정량적 분석 결과")
+        private QuantitativeAnalysis quantitativeAnalysis;
+
+        public MonthlyReportQuantitativeAnalysisRespDto(Report report){
+            this.startDate = CustomUtil.LocalDateTimeToMonthlyReportPublishedDate(report.getStartDate());
+            this.memo = report.getMemo();
+            this.healthStatus = report.getHealthStatusIndicator().getDescription();
+            this.activityLevel = report.getActivityLevelIndicator().getDescription();
+            this.cognitiveFunction = report.getCognitiveFunctionIndicator().getDescription();
+            this.lifeSatisfaction = report.getLifeSatisfactionIndicator().getDescription();
+            this.psychologicalStability = report.getPsychologicalStabilityIndicator().getDescription();
+            this.socialConnectivity = report.getSocialConnectivityIndicator().getDescription();
+            this.supportNeeds = report.getSupportNeedsIndicator().getDescription();
+            // JSON 문자열을 Map으로 파싱
+            try {
+                this.quantitativeAnalysis = gson.fromJson(report.getQuantitativeAnalysis(), QuantitativeAnalysis.class);
+            }catch(JsonSyntaxException e){
+                log.error("JSON 파싱 중 오류 발생: 구문 오류 ", e);
+            }
+
+        }
+    }
+
+    @NoArgsConstructor
+    @Getter
+    @Schema(description = "주간 보고서 정량적 평가 조회 반환 DTO")
+    public static class WeeklyReportQuantitativeAnalysisRespDto{
+        private static final Gson gson = new Gson();
+
+        private static final ObjectMapper om = new ObjectMapper();
+        private static final Logger log = LoggerFactory.getLogger(WeeklyReportQuantitativeAnalysisRespDto.class);
+
+        @Schema(description = "주간 보고서 분석 시작일", example =  "2024.09.20.")
+        private String startDate;
+        @Schema(description = "주간 보고서 분석 종료일", example =  "2024.09.20.")
+        private String endDate;
+
+        @Schema(description = "주간 보고서 발행 요일", example =  "(금)")
+        private String reportDay; //DayOfWeek 타입의 reportDay를 한글로 변환시킨 것
+
+        @Schema(description = "보고서 메모")
+        private String memo;
+
+        @Schema(description = "건강 상태 지표", example =  "그저 그래요")
+        private String healthStatus;
+
+        @Schema(description = "활동 수준 지표", example =  "그저 그래요")
+        private String activityLevel;
+
+        @Schema(description = "인지 기능 지표", example =  "그저 그래요")
+        private String cognitiveFunction;
+
+        @Schema(description = "생활 만족도 지표", example =  "그저 그래요")
+        private String lifeSatisfaction;
+
+        @Schema(description = "심리적 안정 지표", example =  "그저 그래요")
+        private String psychologicalStability;
+
+        @Schema(description = "사회적 연결성 지표", example =  "그저 그래요")
+        private String socialConnectivity;
+
+        @Schema(description = "필요 지원 지표", example =  "그저 그래요")
+        private String supportNeeds;
+
+        @Schema(description = "정량적 분석 결과")
+        private QuantitativeAnalysis quantitativeAnalysis;
+
+        public WeeklyReportQuantitativeAnalysisRespDto(Report report){
+            this.reportDay = report.getReportDay()==null?null:CustomUtil.DayOfWeekToString(report.getReportDay()); //(수)
+            this.startDate = CustomUtil.LocalDateTimeToWeeklyReportCreatedDate(report.getStartDate());
+            this.endDate = CustomUtil.LocalDateTimeToWeeklyReportPublishedDate(report.getEndDate(), 1); //일자를 하나 차감해야 함
+            this.memo = report.getMemo();
+            this.healthStatus = report.getHealthStatusIndicator().getDescription();
+            this.activityLevel = report.getActivityLevelIndicator().getDescription();
+            this.cognitiveFunction = report.getCognitiveFunctionIndicator().getDescription();
+            this.lifeSatisfaction = report.getLifeSatisfactionIndicator().getDescription();
+            this.psychologicalStability = report.getPsychologicalStabilityIndicator().getDescription();
+            this.socialConnectivity = report.getSocialConnectivityIndicator().getDescription();
+            this.supportNeeds = report.getSupportNeedsIndicator().getDescription();
+                // JSON 문자열을 Map으로 파싱
+            try {
+                this.quantitativeAnalysis = gson.fromJson(report.getQuantitativeAnalysis(), QuantitativeAnalysis.class);
+            }catch(JsonSyntaxException e){
+                log.error("JSON 파싱 중 오류 발생: 구문 오류 ", e);
+            }
+
+        }
+    }
 
     @NoArgsConstructor
     @Getter
@@ -40,13 +208,13 @@ public class RespDto {
         public static class MonthlyReportDto{
             public MonthlyReportDto(Report report) {
                 this.reportId = report.getId();
-                this.publishedDate = CustomUtil.LocalDateTimeToMonthlyReportPublishedDate(report.getEndDate()); //2024.07.07.
+                this.startDate = CustomUtil.LocalDateTimeToMonthlyReportPublishedDate(report.getStartDate()); //2024.07
             }
 
             @Schema(description = "월간 보고서 아이디")
             private Long reportId; //보고서 아이디
-            @Schema(description = "월간 보고서 발행 날짜", example =  "2024.09")
-            private String publishedDate; //발행 날짜
+            @Schema(description = "월간 보고서 생성 날짜", example =  "2024.09")
+            private String startDate; //발행 날짜
         }
     }
     @NoArgsConstructor
@@ -70,14 +238,14 @@ public class RespDto {
         public static class WeeklyReportDto{
             public WeeklyReportDto(Report report) {
                 this.reportId = report.getId();
-                this.publishedDate = CustomUtil.LocalDateTimeToWeeklyReportPublishedDate(report.getEndDate()); //2024.07.07.
+                this.startDate = CustomUtil.LocalDateTimeToWeeklyReportCreatedDate(report.getStartDate()); //2024.07.07.
                 this.reportDay = report.getReportDay()==null?null:CustomUtil.DayOfWeekToString(report.getReportDay()); //(수)
             }
 
             @Schema(description = "주간 보고서 아이디")
             private Long reportId; //보고서 아이디
-            @Schema(description = "주간 보고서 발행 날짜", example =  "2024.09.20.")
-            private String publishedDate; //발행 날짜
+            @Schema(description = "주간 보고서 생성 날짜", example =  "2024.09.20.")
+            private String startDate; //발행 날짜
             @Schema(description = "주간 보고서 발행 요일", example =  "(금)")
             private String reportDay; //DayOfWeek 타입의 reportDay를 한글로 변환시킨 것
         }

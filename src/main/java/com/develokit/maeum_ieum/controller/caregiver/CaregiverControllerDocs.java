@@ -288,4 +288,25 @@ public interface CaregiverControllerDocs {
     })
     ResponseEntity<?> deleteElderly(@PathVariable(name = "elderlyId")Long elderlyId,
                                     @AuthenticationPrincipal LoginUser loginUser) throws MalformedURLException;
+
+    @Operation(summary = "노인 주간 보고서 정량적 평가 페이지 조회 ", description = "노인 주간 보고서 정량적 평가 페이지 조회 시 요청: jwt 토큰 사용")
+    @ApiResponses( value = {
+            @ApiResponse(responseCode = "200", description = "요청 성공", content = @Content(schema = @Schema(implementation = WeeklyReportQuantitativeAnalysisRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "토큰 기간 만료", content = @Content(schema = @Schema(implementation = WeeklyReportQuantitativeAnalysisRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR", content = @Content(schema = @Schema(implementation = WeeklyReportQuantitativeAnalysisRespDto.class), mediaType = "application/json")),
+    })
+    ResponseEntity<?> getElderlyWeeklyReportQuantitativeAnalysis(@PathVariable(name = "elderlyId")Long elderlyId,
+                                                                 @PathVariable(name = "reportId")Long reportId,
+                                                                 @AuthenticationPrincipal LoginUser loginUser);
+
+
+    @Operation(summary = "노인 월간 보고서 정량적 평가 페이지 조회 ", description = "노인 월간 보고서 정량적 평가 페이지 조회 시 요청: jwt 토큰 사용")
+    @ApiResponses( value = {
+            @ApiResponse(responseCode = "200", description = "요청 성공", content = @Content(schema = @Schema(implementation = MonthlyReportQuantitativeAnalysisRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "토큰 기간 만료", content = @Content(schema = @Schema(implementation = MonthlyReportQuantitativeAnalysisRespDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "INTERNAL_SERVER_ERROR", content = @Content(schema = @Schema(implementation = MonthlyReportQuantitativeAnalysisRespDto.class), mediaType = "application/json")),
+    })
+    ResponseEntity<?> getElderlyMonthlyReportQuantitativeAnalysis(@PathVariable(name = "elderlyId")Long elderlyId,
+                                                                  @PathVariable(name = "reportId")Long reportId,
+                                                                  @AuthenticationPrincipal LoginUser loginUser);
 }

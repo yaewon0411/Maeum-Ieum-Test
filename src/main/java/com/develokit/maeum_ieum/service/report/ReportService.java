@@ -4,13 +4,22 @@ import com.develokit.maeum_ieum.domain.report.Report;
 import com.develokit.maeum_ieum.domain.report.ReportRepository;
 import com.develokit.maeum_ieum.domain.report.ReportStatus;
 import com.develokit.maeum_ieum.domain.report.ReportType;
+import com.develokit.maeum_ieum.domain.report.indicator.HealthStatusIndicator;
+import com.develokit.maeum_ieum.domain.report.indicator.ReportIndicator;
 import com.develokit.maeum_ieum.domain.user.elderly.Elderly;
 import com.develokit.maeum_ieum.domain.user.elderly.ElderlyRepository;
 import com.develokit.maeum_ieum.dto.report.ReqDto;
 import com.develokit.maeum_ieum.ex.CustomApiException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonSyntaxException;
+import io.swagger.v3.core.util.Json;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.pqc.crypto.ExchangePair;
 import org.hibernate.validator.constraints.Length;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static com.develokit.maeum_ieum.dto.report.ReqDto.*;
 import static com.develokit.maeum_ieum.dto.report.RespDto.*;
@@ -34,6 +44,60 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final ElderlyRepository elderlyRepository;
     private final Logger log = LoggerFactory.getLogger(ReportService.class);
+
+    //TODO 월간 보고서 정량적 평가 조회
+    public MonthlyReportQuantitativeAnalysisRespDto getMonthlyReportQuantitativeAnalysis(Long elderlyId, Long reportId){
+
+        //노인 검증
+        Elderly elderlyPS = elderlyRepository.findById(elderlyId).orElseThrow(
+                () -> new CustomApiException("등록되지 않은 노인 사용자입니다.", HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND)
+        );
+
+        //해당 월간 보고서 가져오기
+        Report reportPS = reportRepository.findById(reportId).orElseThrow(
+                () -> new CustomApiException("존재하지 않는 보고서입니다", HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND)
+        );
+
+        //월간 보고서 아이디로 들어왔는데, 타입이 월간 보고서가 아닌 경우 서버 에러 throw
+        if(!reportPS.getReportType().equals(ReportType.MONTHLY))
+            throw new CustomApiException("서버 내부 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+        try{
+            return new MonthlyReportQuantitativeAnalysisRespDto(reportPS);
+        }catch (JsonSyntaxException e){
+            log.error("월간 보고서 정량적 분석 결과 파싱 중 오류 발생: ", e);
+            throw new CustomApiException("월간 보고서 정량적 분석 결과 파싱 중 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //주간 보고서 정량적 평가 조회
+    public WeeklyReportQuantitativeAnalysisRespDto getWeeklyReportQuantitativeAnalysis(Long elderlyId, Long reportId){
+
+        //노인 검증
+        Elderly elderlyPS = elderlyRepository.findById(elderlyId).orElseThrow(
+                () -> new CustomApiException("등록되지 않은 노인 사용자입니다.", HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND)
+        );
+
+        //해당 주간 보고서 가져오기
+        Report reportPS = reportRepository.findById(reportId).orElseThrow(
+                () -> new CustomApiException("존재하지 않는 보고서입니다", HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND)
+        );
+
+        //주간 보고서 아이디로 들어왔는데, 타입이 주간 보고서가 아닌 경우 서버 에러 throw
+        if(!reportPS.getReportType().equals(ReportType.WEEKLY))
+            throw new CustomApiException("서버 내부 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+        try{
+            return new WeeklyReportQuantitativeAnalysisRespDto(reportPS);
+        }catch (JsonSyntaxException e){
+            log.error("주간 보고서 정량적 분석 결과 파싱 중 오류 발생: ", e);
+            throw new CustomApiException("주간 보고서 정량적 분석 결과 파싱 중 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
 
     //보고서 메모 작성하는 기능
     @Transactional
@@ -55,10 +119,6 @@ public class ReportService {
 
         return new ReportMemoCreateRespDto(reportPS);
     }
-
-
-
-
 
 
     //노인 사용자의 발행된 전체 주간 보고서 내역 보내기
@@ -114,11 +174,12 @@ public class ReportService {
 
     //지표에 따른 보고서 생성하기
     @Transactional
-    public void generateReportContent(Report report){
+    public void generateReportContent(Report report) throws JsonProcessingException {
 
         //어쩌구저쩌구
         report.setQualitativeAnalysis("정성적 보고서 분석 결과");
-        report.setQuantitativeAnalysis("정량적 보고서 분석 결과");
+
+        report.setQuantitativeAnalysis(HealthStatusIndicator.GOOD, "유우시군 건강 상태 사이코🤍");
 
     }
 
