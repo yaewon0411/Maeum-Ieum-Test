@@ -51,7 +51,7 @@ class ReportGenerationSchedulerTest {
     private ReportService reportService;
     @Autowired
     private EntityManager em;
-    private LocalDateTime today;
+    private LocalDate today;
 
     @Autowired
     private JobRepository jobRepository;
@@ -62,7 +62,7 @@ class ReportGenerationSchedulerTest {
     @Rollback
     void setUp(){
         //reportRepository.deleteAll();
-        today = LocalDateTime.now();
+        today = LocalDate.now();
 //        Report report = reportRepository.findById(2L).orElse(null);
 //        report.setStartDate(today.minusWeeks(1));
 
@@ -139,7 +139,7 @@ class ReportGenerationSchedulerTest {
     void testFullReportGenerationJob() throws Exception {
         // 시나리오 3: 유저 C는 일주일 전에 생성된 PENDING 상태의 보고서가 있음 -> 따라서 유저 C는 보고서 분석 작업이 진행되어야 함
 
-        LocalDate todayLocalDate = today.toLocalDate();
+        LocalDate todayLocalDate = today;
         System.out.println("todayLocalDate = " + todayLocalDate);
 
         // 배치 작업 실행
